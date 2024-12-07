@@ -20,6 +20,7 @@ import { IconBrandGithub } from "@tabler/icons-react";
 import Password from "./password";
 import { Button } from "./button";
 import { Logo } from "./Logo";
+import { useState } from "react";
 
 const formSchema = z.object({
   email: z
@@ -38,6 +39,9 @@ const formSchema = z.object({
 export type LoginUser = z.infer<typeof formSchema>;
 
 export function LoginForm() {
+  const router = useRouter();
+  const [error, setError] = useState<string>("");
+
   const form = useForm<LoginUser>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -46,10 +50,9 @@ export function LoginForm() {
     },
   });
 
-  const router = useRouter();
-
   async function onSubmit(values: LoginUser) {
     try {
+      setError("");
       const result = await signIn("credentials", {
         email: values.email,
         password: values.password,
@@ -57,14 +60,16 @@ export function LoginForm() {
       });
 
       if (result?.error) {
-        form.setError("root", { message: "Invalid credentials" });
+        setError(result.error);
         return;
       }
 
-      router.push("/dashboard");
+      if (result?.ok) {
+        router.push("/dashboard");
+      }
     } catch (e) {
       console.error(e);
-      form.setError("root", { message: "Something went wrong" });
+      setError("An unexpected error occurred");
     }
   }
 
@@ -87,6 +92,11 @@ export function LoginForm() {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-6"
               >
+                {error && (
+                  <div className="p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                    {error}
+                  </div>
+                )}
                 <div>
                   <FormField
                     control={form.control}
@@ -160,7 +170,7 @@ export function LoginForm() {
                       "text-sm text-neutral-500 text-center mt-4 text-muted dark:text-muted-dark"
                     )}
                   >
-                    Don&apos; have an account?{" "}
+                    Don&apos;t have an account?{" "}
                     <Link href="/signup" className="text-black dark:text-white">
                       Sign up
                     </Link>
