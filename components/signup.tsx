@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { signIn } from "next-auth/react";
 
 import {
   Form,
@@ -51,10 +52,40 @@ export function SignupForm() {
     },
   });
 
+  const router = useRouter();
+
   async function onSubmit(values: LoginUser) {
     try {
-      console.log("submitted form", values);
-    } catch (e) {}
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        const error = await response.text();
+        form.setError("root", { message: error });
+        return;
+      }
+
+      const result = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        form.setError("root", { message: "Failed to sign in" });
+        return;
+      }
+
+      router.push("/dashboard");
+    } catch (e) {
+      console.error(e);
+      form.setError("root", { message: "Something went wrong" });
+    }
   }
 
   return (

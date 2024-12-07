@@ -4,6 +4,7 @@ import { GeistSans } from "geist/font/sans";
 import { cn } from "@/lib/utils";
 import { ViewTransitions } from "next-view-transitions";
 import { ThemeProvider } from "@/context/theme-provider";
+import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
   title: "Everything AI",
@@ -28,14 +29,16 @@ export default function RootLayout({
             "bg-white dark:bg-black antialiased h-full w-full"
           )}
         >
-          <ThemeProvider
-            attribute="class"
-            enableSystem
-            disableTransitionOnChange
-            defaultTheme="light"
-          >
-            {children}
-          </ThemeProvider>
+          <Providers>
+            <ThemeProvider
+              attribute="class"
+              enableSystem
+              disableTransitionOnChange
+              defaultTheme="light"
+            >
+              {children}
+            </ThemeProvider>
+          </Providers>
         </body>
       </html>
     </ViewTransitions>

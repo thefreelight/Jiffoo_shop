@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { signIn } from "next-auth/react";
 
 import {
   Form,
@@ -45,10 +46,26 @@ export function LoginForm() {
     },
   });
 
+  const router = useRouter();
+
   async function onSubmit(values: LoginUser) {
     try {
-      console.log("submitted form", values);
-    } catch (e) {}
+      const result = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        form.setError("root", { message: "Invalid credentials" });
+        return;
+      }
+
+      router.push("/dashboard");
+    } catch (e) {
+      console.error(e);
+      form.setError("root", { message: "Something went wrong" });
+    }
   }
 
   return (
