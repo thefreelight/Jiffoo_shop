@@ -29,46 +29,11 @@ interface Testimonial {
 
 const testimonials = [
   {
-    name: "Manu Arora",
-    quote:
-      "What a fantastic AI Every AI is, I just love it. It has completely transformed the way I approach problems and develop solutions.",
-    src: "https://i.pravatar.cc/150?img=1",
-    designation: "Tech Innovator & Entrepreneur",
-  },
-  {
-    name: "Tyler Durden",
-    quote:
-      "I made a soap with the help of AI, it was so easy to use. I'm so glad this happened because it revolutionized my entire business model and production process.",
-    src: "https://i.pravatar.cc/150?img=2",
-    designation: "Creative Director & Business Owner",
-  },
-  {
-    name: "Alice Johnson",
-    quote:
-      "This AI has transformed the way I work! It's like having a brilliant assistant who knows exactly what I need before I even ask.",
-    src: "https://i.pravatar.cc/150?img=3",
-    designation: "Senior Software Engineer",
-  },
-  {
     name: "Bob Smith",
     quote:
       "Absolutely revolutionary, a game-changer for our industry. It has streamlined our processes and enhanced our productivity dramatically.",
     src: "https://i.pravatar.cc/150?img=4",
     designation: "Industry Analyst",
-  },
-  {
-    name: "Cathy Lee",
-    quote:
-      "I can't imagine going back to how things were before this AI. It has not only improved my work efficiency but also my daily life.",
-    src: "https://i.pravatar.cc/150?img=5",
-    designation: "Product Manager",
-  },
-  {
-    name: "David Wright",
-    quote:
-      "It's like having a superpower! This AI tool has given us the ability to do things we never thought were possible in our field.",
-    src: "https://i.pravatar.cc/150?img=6",
-    designation: "Research Scientist",
   },
   {
     name: "Eva Green",
@@ -78,25 +43,25 @@ const testimonials = [
     designation: "Operations Director",
   },
   {
-    name: "Frank Moore",
-    quote:
-      "A robust solution that fits perfectly into our workflow. It has enhanced our team's capabilities and allowed us to tackle more complex projects.",
-    src: "https://i.pravatar.cc/150?img=8",
-    designation: "Project Manager",
-  },
-  {
-    name: "Grace Hall",
-    quote:
-      "It's incredibly intuitive and easy to use. Even those without technical expertise can leverage its power to improve their workflows.",
-    src: "https://i.pravatar.cc/150?img=9",
-    designation: "Marketing Specialist",
-  },
-  {
     name: "Henry Ford",
     quote:
       "It has saved us countless hours. Highly recommended for anyone looking to enhance their efficiency and productivity.",
     src: "https://i.pravatar.cc/150?img=10",
     designation: "Operations Analyst",
+  },
+  {
+    name: "Cathy Lee",
+    quote:
+      "I can't imagine going back to how things were before this AI. It has not only improved my work efficiency but also my daily life.",
+    src: "https://i.pravatar.cc/150?img=5",
+    designation: "Product Manager",
+  },
+  {
+    name: "Frank Moore",
+    quote:
+      "A robust solution that fits perfectly into our workflow. It has enhanced our team's capabilities and allowed us to tackle more complex projects.",
+    src: "https://i.pravatar.cc/150?img=8",
+    designation: "Project Manager",
   },
   {
     name: "Ivy Wilson",
@@ -106,25 +71,11 @@ const testimonials = [
     designation: "Business Consultant",
   },
   {
-    name: "Jack Brown",
+    name: "Grace Hall",
     quote:
-      "The results are always impressive. This AI has helped us to not only meet but exceed our performance targets.",
-    src: "https://i.pravatar.cc/150?img=12",
-    designation: "Performance Manager",
-  },
-  {
-    name: "Kathy Adams",
-    quote:
-      "It helps us achieve what was once thought impossible. The AI's capabilities are groundbreaking and have opened new avenues for us.",
-    src: "https://i.pravatar.cc/150?img=13",
-    designation: "Innovation Lead",
-  },
-  {
-    name: "Leo Carter",
-    quote:
-      "Transformative technology with real impact. It has streamlined our operations and brought unprecedented efficiency to our processes.",
-    src: "https://i.pravatar.cc/150?img=14",
-    designation: "Technology Strategist",
+      "It's incredibly intuitive and easy to use. Even those without technical expertise can leverage its power to improve their workflows.",
+    src: "https://i.pravatar.cc/150?img=9",
+    designation: "Marketing Specialist",
   },
   {
     name: "Mia Turner",
@@ -134,54 +85,12 @@ const testimonials = [
     designation: "Systems Integrator",
   },
   {
-    name: "Nathan Hill",
-    quote:
-      "The best investment we've made in years. It's not just a tool; it's a game-changer that has propelled our business forward.",
-    src: "https://i.pravatar.cc/150?img=16",
-    designation: "Investment Analyst",
-  },
-  {
-    name: "Olivia Scott",
-    quote:
-      "It consistently exceeds our expectations. Its adaptability and precision make it indispensable for our daily operations.",
-    src: "https://i.pravatar.cc/150?img=17",
-    designation: "Quality Assurance Manager",
-  },
-  {
-    name: "Peter White",
-    quote:
-      "A seamless integration into our daily tasks. It has enhanced our productivity and allowed us to focus on more strategic initiatives.",
-    src: "https://i.pravatar.cc/150?img=18",
-    designation: "Strategic Planner",
-  },
-  {
-    name: "Quinn Taylor",
-    quote:
-      "It's a game-changer for our business. The insights it provides are invaluable and have driven substantial growth for us.",
-    src: "https://i.pravatar.cc/150?img=19",
-    designation: "Growth Manager",
-  },
-  {
-    name: "Rachel Black",
-    quote:
-      "The support team is as impressive as the technology itself. They ensure we maximize the utility of the AI in our operations.",
-    src: "https://i.pravatar.cc/150?img=20",
-    designation: "Client Support Coordinator",
-  },
-  {
     name: "Samuel Lee",
     quote:
       "It's the future, now. Adopting this AI has put us years ahead of the competition in terms of operational efficiency and innovation.",
     src: "https://i.pravatar.cc/150?img=21",
     designation: "Futurist",
-  },
-  {
-    name: "Tina Brooks",
-    quote:
-      "It has completely changed the way we operate. The AI's ability to analyze and optimize our processes is phenomenal.",
-    src: "https://i.pravatar.cc/150?img=22",
-    designation: "Process Analyst",
-  },
+  }
 ];
 
 function Testimonial({
@@ -207,11 +116,10 @@ function Testimonial({
     ];
   }, []);
 
-  const boxStyle = {};
   return (
     <figure
       className={cn(
-        "animate-fade-in rounded-3xl bg-transparent p-8 opacity-0 shadow-derek dark:bg-neutral-900 hover:bg-gradient-to-r hover:from-[#0aa6fd]/5 hover:to-[#2a2bdb]/5 transition-all duration-500",
+        "animate-fade-in rounded-3xl bg-white/5 p-8 opacity-0 shadow-lg backdrop-blur-sm dark:bg-neutral-900/50 hover:bg-gradient-to-r hover:from-[#0aa6fd]/5 hover:to-[#2a2bdb]/5 transition-all duration-500 border border-gray-100/10",
         className
       )}
       style={{
@@ -229,7 +137,7 @@ function Testimonial({
             alt={name}
           />
           <div>
-            <h3 className="text-sm  font-medium text-neutral-500 dark:text-neutral-300">
+            <h3 className="text-sm font-medium text-neutral-500 dark:text-neutral-300">
               {name}
             </h3>
             <p className="text-sm font-normal text-neutral-500 dark:text-neutral-300">
@@ -318,8 +226,8 @@ function TestimonialGrid() {
         className="hidden lg:block"
         shift={10}
       />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white dark:from-black" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white dark:from-black" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white via-white to-transparent dark:from-black dark:via-black" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white via-white to-transparent dark:from-black dark:via-black" />
     </InViewDiv>
   );
 }

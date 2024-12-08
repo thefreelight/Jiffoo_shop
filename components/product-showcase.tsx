@@ -1,16 +1,25 @@
 import { Heading } from "./heading";
 import { Subheading } from "./subheading";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import { Button } from "./button";
 import { HiArrowRight } from "react-icons/hi2";
 import { IconCode, IconRocket } from "@tabler/icons-react";
 import Link from "next/link";
 
-const products = [
+interface Product {
+  title: string;
+  description: string;
+  image?: string | StaticImageData;
+  icon?: React.ReactNode;
+  link: string;
+  comingSoon: boolean;
+}
+
+const products: Product[] = [
   {
     title: "NavToAI",
     description: "Launch your AI tools directory in minutes with our modern, customizable template.",
-    image: "/navtoai.png" as string,
+    image: "/navtoai.png",
     link: "https://navtoai.com",
     comingSoon: false
   },
@@ -58,14 +67,14 @@ export const ProductShowcase = () => {
                     </div>
                     <div className="absolute inset-0 bg-[linear-gradient(45deg,rgba(255,255,255,0.1)_25%,transparent_25%,transparent_50%,rgba(255,255,255,0.1)_50%,rgba(255,255,255,0.1)_75%,transparent_75%,transparent)] bg-[length:64px_64px] animate-move-bg opacity-10"></div>
                   </div>
-                ) : (
+                ) : product.image ? (
                   <Image
                     src={product.image}
                     alt={product.title}
                     fill
                     className="object-cover transform group-hover:scale-105 transition-transform duration-300"
                   />
-                )}
+                ) : null}
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-2 bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-transparent bg-clip-text">

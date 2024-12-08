@@ -13,7 +13,7 @@ export function TestimonialColumnContainer({
 }) {
   let columnRef = useRef<React.ElementRef<"div">>(null);
   let [columnHeight, setColumnHeight] = useState(0);
-  let duration = `${columnHeight * shift}ms`;
+  let duration = `${columnHeight * 20}ms`;
 
   useEffect(() => {
     if (!columnRef.current) {
@@ -35,7 +35,10 @@ export function TestimonialColumnContainer({
     <div
       ref={columnRef}
       className={cn("animate-marquee space-y-8 py-4", className)}
-      style={{ "--marquee-duration": duration } as React.CSSProperties}
+      style={{ 
+        "--marquee-duration": duration,
+        transform: `translateY(${shift}%)`,
+      } as React.CSSProperties}
     >
       {children}
     </div>

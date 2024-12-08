@@ -57,7 +57,7 @@ export const Features = () => {
                   <p className="text-sm">$ git clone jiffoo/ai-chatbot-template</p>
                 </div>
                 <div className="bg-black text-white p-4 rounded-lg">
-                  <p className="text-sm">Cloning into 'ai-chatbot-template'...</p>
+                  <p className="text-sm">Cloning into &apos;ai-chatbot-template&apos;...</p>
                   <p className="text-sm">Done in 2.1s</p>
                 </div>
                 <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
