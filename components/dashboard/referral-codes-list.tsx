@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "../button";
-import { IconEdit, IconX } from "@tabler/icons-react";
+import { IconEdit, IconX, IconCopy, IconCheck } from "@tabler/icons-react";
 import { toast } from "sonner";
 
 interface ReferralCode {
@@ -26,6 +26,7 @@ interface ReferralCodesListProps {
 export function ReferralCodesList({ referralCodes, basePrice }: ReferralCodesListProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [newCode, setNewCode] = useState("");
+  const [copied, setCopied] = useState(false);
 
   const handleUpdateCode = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +52,18 @@ export function ReferralCodesList({ referralCodes, basePrice }: ReferralCodesLis
     } catch (error) {
       console.error('Error updating referral code:', error);
       toast.error(error instanceof Error ? error.message : 'Failed to update referral code');
+    }
+  };
+
+  const copyInviteLink = async (code: string) => {
+    const inviteLink = `${window.location.origin}/signup?referralCode=${code}`;
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      setCopied(true);
+      toast.success('Invite link copied to clipboard');
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      toast.error('Failed to copy invite link');
     }
   };
 
@@ -129,8 +142,29 @@ export function ReferralCodesList({ referralCodes, basePrice }: ReferralCodesLis
                 >
                   <IconEdit className="h-4 w-4" />
                 </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => copyInviteLink(code.code)}
+                  className="p-2"
+                >
+                  {copied ? (
+                    <IconCheck className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <IconCopy className="h-4 w-4" />
+                  )}
+                </Button>
               </div>
-              <div className="mt-2 grid grid-cols-3 gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+              <div className="mt-4">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                  Share your invite link:
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <code className="px-3 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-900 text-sm flex-1 overflow-x-auto">
+                    {`${typeof window !== 'undefined' ? window.location.origin : ''}/signup?referralCode=${code.code}`}
+                  </code>
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-4 text-sm text-neutral-600 dark:text-neutral-400">
                 <div>
                   <p>Discount</p>
                   <p className="font-medium text-black dark:text-white">

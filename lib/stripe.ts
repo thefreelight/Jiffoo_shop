@@ -1,5 +1,7 @@
 import Stripe from 'stripe';
 import { validateReferralCode, calculateDiscountedPrice } from './referral';
+import prisma from '@/lib/prisma';
+import { inviteUserToRepo } from './github';
 import { PrismaClient } from '@prisma/client';
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -61,18 +63,20 @@ export async function createCheckoutSession({ userId, referralCode }: CreateChec
 }
 
 export async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
+  console.log('Starting handleCheckoutComplete for session:', session.id);
   const { userId, referralCodeId, basePrice, finalPrice, discountAmount } = session.metadata || {};
   
   if (!userId) {
+    console.error('No userId found in session metadata');
     throw new Error('No userId found in session metadata');
   }
 
-  const prisma = new PrismaClient();
-  
   try {
+    console.log('Starting database transaction for user:', userId);
     // Start a transaction to ensure all database operations succeed or fail together
-    await prisma.$transaction(async (tx: PrismaClient) => {
+    await prisma.$transaction(async (tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'>) => {
       // Create the purchase record
+      console.log('Creating purchase record...');
       const purchase = await tx.purchase.create({
         data: {
           userId,
@@ -83,15 +87,19 @@ export async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
           accessGranted: true,
         },
       });
+      console.log('Purchase record created:', purchase.id);
 
       // Update user access
-      await tx.user.update({
+      console.log('Updating user access...');
+      const user = await tx.user.update({
         where: { id: userId },
         data: { hasAccess: true },
       });
+      console.log('User access updated for:', user.id);
 
       // If there was a referral code used, record it
       if (referralCodeId) {
+        console.log('Processing referral code:', referralCodeId);
         await tx.referralUse.create({
           data: {
             referralCodeId,
@@ -111,9 +119,25 @@ export async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
             status: 'pending',
           },
         });
+        console.log('Referral and commission records created');
+      }
+
+      // Send GitHub repository invitation
+      if (user.email) {
+        try {
+          console.log('Sending GitHub invitation to:', user.email);
+          await inviteUserToRepo(user.email);
+          console.log('GitHub invitation sent successfully');
+        } catch (error) {
+          console.error('Failed to send GitHub invitation:', error);
+          // Don't throw error here to avoid rolling back the transaction
+          // We can handle this separately
+        }
       }
     });
-  } finally {
-    await prisma.$disconnect();
+    console.log('Transaction completed successfully');
+  } catch (error) {
+    console.error('Error in handleCheckoutComplete:', error);
+    throw error;
   }
 } 

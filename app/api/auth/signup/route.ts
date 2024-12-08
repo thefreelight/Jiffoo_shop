@@ -6,7 +6,7 @@ import { generateReferralCode, getReferralRates } from "@/lib/referral";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { email, name, password } = body;
+    const { email, name, password, referralCode } = body;
 
     if (!email || !name || !password) {
       return new NextResponse("Missing required fields", { status: 400 });
@@ -19,6 +19,14 @@ export async function POST(req: Request) {
 
     if (existingUser) {
       return new NextResponse("User already exists", { status: 400 });
+    }
+
+    // Validate referral code if provided
+    if (referralCode) {
+      const validation = await validateReferralCode(referralCode, '');
+      if (!validation.valid) {
+        return new NextResponse(validation.error || "Invalid referral code", { status: 400 });
+      }
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -38,7 +46,7 @@ export async function POST(req: Request) {
       const rates = await getReferralRates('user');
 
       // Generate and create referral code
-      await tx.referralCode.create({
+      const userReferralCode = await tx.referralCode.create({
         data: {
           userId: user.id,
           code: generateReferralCode(),
@@ -47,6 +55,25 @@ export async function POST(req: Request) {
           isActive: true,
         },
       });
+
+      // If user signed up with a referral code, record the use
+      if (referralCode) {
+        const referrerCode = await tx.referralCode.findUnique({
+          where: { code: referralCode },
+        });
+
+        if (referrerCode) {
+          await tx.referralUse.create({
+            data: {
+              referralCodeId: referrerCode.id,
+              userId: user.id,
+              purchaseId: 'signup_' + user.id, // Special case for signup referrals
+              discountAmount: 0, // No discount for signup referrals
+              finalPrice: 0, // No price for signup referrals
+            },
+          });
+        }
+      }
 
       return user;
     });
