@@ -17,6 +17,14 @@ const nextConfig = {
   experimental: {
     mdxRs: true,
   },
+  // 添加图片域名配置
+  images: {
+    domains: [
+      'cdn.simpleicons.org',
+      'images.unsplash.com',
+      'i.pravatar.cc'
+    ],
+  },
   // 添加 Cloudflare 相关配置
   headers: async () => {
     return [
