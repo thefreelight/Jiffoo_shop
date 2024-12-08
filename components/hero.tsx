@@ -29,7 +29,7 @@ export const Hero = () => {
         className="flex justify-center"
       >
         <Badge onClick={() => router.push("/blog")}>
-          🚀 Launch Your AI Tools Directory in Minutes
+          🚀 Launch Your Directory in Minutes
         </Badge>
       </motion.div>
       <motion.h1
@@ -47,7 +47,7 @@ export const Hero = () => {
         }}
         className="text-2xl md:text-4xl lg:text-8xl font-semibold max-w-6xl mx-auto text-center mt-6 relative z-10"
       >
-        <Balancer>Build Your Own AI Tools Directory with NavToAI</Balancer>
+        <Balancer>Build Your Own Directory with NavToAI</Balancer>
       </motion.h1>
       <motion.p
         initial={{
