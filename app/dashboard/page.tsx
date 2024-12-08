@@ -1,8 +1,3 @@
-"use client";
-
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { Container } from "@/components/container";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { ReferralCodesList } from "@/components/dashboard/referral-codes-list";

@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "../button";
-import { IconPlus, IconTrash, IconEdit, IconCopy } from "@tabler/icons-react";
-import { calculateDiscountedPrice } from "@/lib/referral";
+import { IconPlus, IconTrash, IconEdit } from "@tabler/icons-react";
 
 interface ReferralCode {
   id: string;
@@ -29,100 +28,108 @@ export function ReferralCodesList({ referralCodes, basePrice }: ReferralCodesLis
   const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState<string | null>(null);
 
-  const handleCopyCode = async (code: string) => {
-    await navigator.clipboard.writeText(code);
-    // TODO: Add toast notification
-  };
-
-  const handleCreateCode = async () => {
+  const handleCreate = () => {
     setIsCreating(true);
-    // TODO: Implement create code modal
   };
 
-  const handleEditCode = (id: string) => {
+  const handleEdit = (id: string) => {
     setIsEditing(id);
-    // TODO: Implement edit code modal
   };
 
-  const handleDeleteCode = async (id: string) => {
-    // TODO: Add confirmation dialog
+  const handleDelete = async (id: string) => {
     try {
-      const response = await fetch(`/api/referral/delete?id=${id}`, {
-        method: 'DELETE',
+      const response = await fetch(`/api/referral/delete`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete referral code');
+        throw new Error("Failed to delete referral code");
       }
 
-      // TODO: Refresh data
+      // Refresh the page to show updated data
+      window.location.reload();
     } catch (error) {
-      console.error('Error deleting referral code:', error);
-      // TODO: Add error toast
+      console.error("Error deleting referral code:", error);
     }
   };
 
   return (
-    <div className="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden">
-      <div className="p-6 border-b border-neutral-200 dark:border-neutral-800">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Your Referral Codes</h2>
-          <Button
-            onClick={handleCreateCode}
-            className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500"
-          >
-            <IconPlus className="h-4 w-4 mr-2" />
-            Create Code
-          </Button>
-        </div>
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-black dark:text-white">Your Referral Codes</h2>
+        <Button onClick={handleCreate} className="flex items-center gap-2">
+          <IconPlus className="h-4 w-4" />
+          Create New Code
+        </Button>
       </div>
-      <div className="divide-y divide-neutral-200 dark:divide-neutral-800">
-        {referralCodes.map((code) => {
-          const priceData = calculateDiscountedPrice(basePrice, code.discountPercent);
-          return (
-            <div key={code.id} className="p-6 flex items-center justify-between">
+
+      <div className="grid gap-4">
+        {referralCodes.map((code) => (
+          <div
+            key={code.id}
+            className="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 rounded-xl p-6"
+          >
+            <div className="flex items-center justify-between">
               <div>
-                <div className="flex items-center gap-2">
-                  <p className="font-mono text-lg font-semibold">{code.code}</p>
-                  <button
-                    onClick={() => handleCopyCode(code.code)}
-                    className="text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
+                <div className="flex items-center gap-4">
+                  <h3 className="text-lg font-semibold text-black dark:text-white">
+                    {code.code}
+                  </h3>
+                  <span
+                    className={`px-2 py-1 text-xs font-medium rounded-full ${
+                      code.isActive
+                        ? "bg-green-100 text-green-800"
+                        : "bg-red-100 text-red-800"
+                    }`}
                   >
-                    <IconCopy className="h-4 w-4" />
-                  </button>
+                    {code.isActive ? "Active" : "Inactive"}
+                  </span>
                 </div>
-                <div className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-                  {code.discountPercent}% off • ${(priceData.finalPrice / 100).toFixed(2)} final price
-                </div>
-                <div className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
-                  {code.uses.length} uses • ${((code.commissions.reduce((sum, commission) => 
-                    sum + (commission.status === 'paid' ? commission.amount : 0), 0)) / 100).toFixed(2)} earned
+                <div className="mt-2 grid grid-cols-3 gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+                  <div>
+                    <p>Discount</p>
+                    <p className="font-medium text-black dark:text-white">
+                      {code.discountPercent}%
+                    </p>
+                  </div>
+                  <div>
+                    <p>Commission Rate</p>
+                    <p className="font-medium text-black dark:text-white">
+                      {code.commissionRate}%
+                    </p>
+                  </div>
+                  <div>
+                    <p>Uses</p>
+                    <p className="font-medium text-black dark:text-white">
+                      {code.uses.length}
+                      {code.maxUses ? `/${code.maxUses}` : ""}
+                    </p>
+                  </div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Button
-                  variant="simple"
-                  onClick={() => handleEditCode(code.id)}
-                  className="text-neutral-700 dark:text-neutral-300"
+                  variant="outline"
+                  onClick={() => handleEdit(code.id)}
+                  className="p-2"
                 >
                   <IconEdit className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant="simple"
-                  onClick={() => handleDeleteCode(code.id)}
-                  className="text-red-500 hover:text-red-600 dark:hover:text-red-400"
+                  variant="outline"
+                  onClick={() => handleDelete(code.id)}
+                  className="p-2 text-red-600 hover:text-red-700"
                 >
                   <IconTrash className="h-4 w-4" />
                 </Button>
               </div>
             </div>
-          );
-        })}
-        {referralCodes.length === 0 && (
-          <div className="p-6 text-center text-neutral-600 dark:text-neutral-400">
-            No referral codes yet. Create one to start earning commissions!
           </div>
-        )}
+        ))}
       </div>
     </div>
   );

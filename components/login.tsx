@@ -15,7 +15,6 @@ import {
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { useRouter } from "next/navigation";
 import { IconBrandGithub } from "@tabler/icons-react";
 import Password from "./password";
 import { Button } from "./button";
@@ -39,8 +38,8 @@ const formSchema = z.object({
 export type LoginUser = z.infer<typeof formSchema>;
 
 export function LoginForm() {
-  const router = useRouter();
   const [error, setError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<LoginUser>({
     resolver: zodResolver(formSchema),
@@ -50,28 +49,37 @@ export function LoginForm() {
     },
   });
 
-  async function onSubmit(values: LoginUser) {
-    try {
-      setError("");
-      const result = await signIn("credentials", {
-        email: values.email,
-        password: values.password,
-        redirect: false,
+  const handleSubmit = (values: LoginUser) => {
+    setIsLoading(true);
+    setError("");
+
+    fetch("/api/auth/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(values),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          signIn("credentials", {
+            email: values.email,
+            password: values.password,
+            callbackUrl: "/dashboard",
+          });
+        } else {
+          setError(data.error || "Login failed");
+        }
+      })
+      .catch((err) => {
+        console.error("Login error:", err);
+        setError("An unexpected error occurred");
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-
-      if (result?.error) {
-        setError(result.error);
-        return;
-      }
-
-      if (result?.ok) {
-        router.push("/dashboard");
-      }
-    } catch (e) {
-      console.error(e);
-      setError("An unexpected error occurred");
-    }
-  }
+  };
 
   return (
     <Form {...form}>
@@ -89,7 +97,7 @@ export function LoginForm() {
           <div className="mt-10">
             <div>
               <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={form.handleSubmit(handleSubmit)}
                 className="space-y-6"
               >
                 {error && (
@@ -116,6 +124,7 @@ export function LoginForm() {
                               type="email"
                               placeholder="hello@johndoe.com"
                               className="block w-full bg-white dark:bg-neutral-900 px-4 rounded-md border border-neutral-200 dark:border-neutral-800 py-1.5 text-black dark:text-white placeholder:text-neutral-400 focus:ring-2 focus:ring-[#0aa6fd] focus:border-transparent focus:outline-none sm:text-sm sm:leading-6"
+                              disabled={isLoading}
                               {...field}
                             />
                           </div>
@@ -145,6 +154,7 @@ export function LoginForm() {
                               type="password"
                               placeholder="••••••••"
                               className="block w-full bg-white dark:bg-neutral-900 px-4 rounded-md border border-neutral-200 dark:border-neutral-800 py-1.5 text-black dark:text-white placeholder:text-neutral-400 focus:ring-2 focus:ring-[#0aa6fd] focus:border-transparent focus:outline-none sm:text-sm sm:leading-6"
+                              disabled={isLoading}
                               {...field}
                             />
                           </div>
@@ -164,14 +174,23 @@ export function LoginForm() {
                 </div>
 
                 <div>
-                  <Button className="w-full bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">Sign in</Button>
+                  <Button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500"
+                  >
+                    {isLoading ? "Signing in..." : "Sign in"}
+                  </Button>
                   <p
                     className={cn(
                       "text-sm text-neutral-500 text-center mt-4 text-muted dark:text-muted-dark"
                     )}
                   >
                     Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="text-[#0aa6fd] hover:text-[#2a2bdb] transition-colors duration-200">
+                    <Link
+                      href="/signup"
+                      className="text-[#0aa6fd] hover:text-[#2a2bdb] transition-colors duration-200"
+                    >
                       Sign up
                     </Link>
                   </p>
@@ -195,27 +214,23 @@ export function LoginForm() {
               </div>
 
               <div className="mt-6 w-full flex items-center justify-center">
-                <Button onClick={() => {}} className="w-full py-1.5 bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">
+                <Button
+                  type="button"
+                  onClick={() => {}}
+                  className="w-full py-1.5 bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500"
+                >
                   <IconBrandGithub className="h-5 w-5" />
-                  <span className="text-sm font-semibold leading-6">
-                    Github
-                  </span>
+                  <span className="text-sm font-semibold leading-6">Github</span>
                 </Button>
               </div>
 
               <p className="text-neutral-600 dark:text-neutral-400 text-sm text-center mt-8">
                 By clicking on sign in, you agree to our{" "}
-                <Link
-                  href="#"
-                  className="text-neutral-500 dark:text-neutral-300"
-                >
+                <Link href="#" className="text-neutral-500 dark:text-neutral-300">
                   Terms of Service
                 </Link>{" "}
                 and{" "}
-                <Link
-                  href="#"
-                  className="text-neutral-500 dark:text-neutral-300"
-                >
+                <Link href="#" className="text-neutral-500 dark:text-neutral-300">
                   Privacy Policy
                 </Link>
               </p>
