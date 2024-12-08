@@ -3,79 +3,83 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { Container } from "@/components/container";
+import { DashboardHeader } from "@/components/dashboard/header";
+import { ReferralCodesList } from "@/components/dashboard/referral-codes-list";
+import { CommissionStats } from "@/components/dashboard/commission-stats";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/auth";
+import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
 
-export default function DashboardPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+interface ReferralCode {
+  id: string;
+  code: string;
+  discountPercent: number;
+  commissionRate: number;
+  isActive: boolean;
+  maxUses: number | null;
+  expiresAt: Date | null;
+  uses: Array<any>;
+  commissions: Array<{
+    status: string;
+    amount: number;
+  }>;
+}
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
-  }, [status, router]);
+export default async function DashboardPage() {
+  const session = await getServerSession(authOptions);
 
-  if (status === "loading") {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold">Loading...</h2>
-        </div>
-      </div>
-    );
+  if (!session?.user) {
+    redirect('/login');
   }
 
+  // Fetch user's referral codes and commission data
+  const referralCodes = await prisma.referralCode.findMany({
+    where: {
+      userId: session.user.id,
+    },
+    include: {
+      uses: true,
+      commissions: true,
+    },
+  });
+
+  // Calculate total stats
+  const stats = referralCodes.reduce((acc: {
+    totalUses: number;
+    totalCommission: number;
+    pendingCommission: number;
+  }, code: ReferralCode) => {
+    const totalUses = code.uses.length;
+    const totalCommission = code.commissions.reduce((sum, commission) => 
+      sum + (commission.status === 'paid' ? commission.amount : 0), 0);
+    const pendingCommission = code.commissions.reduce((sum, commission) => 
+      sum + (commission.status === 'pending' ? commission.amount : 0), 0);
+
+    return {
+      totalUses: acc.totalUses + totalUses,
+      totalCommission: acc.totalCommission + totalCommission,
+      pendingCommission: acc.pendingCommission + pendingCommission,
+    };
+  }, {
+    totalUses: 0,
+    totalCommission: 0,
+    pendingCommission: 0,
+  });
+
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
-        <div className="flex items-center justify-between mb-8">
-          <h1 className="text-3xl font-bold text-black dark:text-white">
-            Welcome, {session?.user?.name || "User"}
-          </h1>
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900">
+      <DashboardHeader />
+      <Container className="py-10">
+        <div className="space-y-10">
+          <CommissionStats stats={stats} />
+          <ReferralCodesList 
+            referralCodes={referralCodes}
+            basePrice={9900}
+          />
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* 统计卡片 */}
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-lg shadow-aceternity">
-            <h3 className="text-lg font-semibold text-black dark:text-white mb-2">
-              Profile Status
-            </h3>
-            <p className="text-neutral-600 dark:text-neutral-400">
-              Your profile is complete
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-lg shadow-aceternity">
-            <h3 className="text-lg font-semibold text-black dark:text-white mb-2">
-              Account Type
-            </h3>
-            <p className="text-neutral-600 dark:text-neutral-400">
-              Free Plan
-            </p>
-          </div>
-
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-lg shadow-aceternity">
-            <h3 className="text-lg font-semibold text-black dark:text-white mb-2">
-              Last Login
-            </h3>
-            <p className="text-neutral-600 dark:text-neutral-400">
-              {new Date().toLocaleDateString()}
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold text-black dark:text-white mb-6">
-            Recent Activity
-          </h2>
-          <div className="bg-white dark:bg-neutral-900 rounded-lg shadow-aceternity overflow-hidden">
-            <div className="p-6">
-              <p className="text-neutral-600 dark:text-neutral-400">
-                No recent activity
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      </Container>
     </div>
   );
 } 

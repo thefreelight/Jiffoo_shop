@@ -17,9 +17,14 @@ model User {
   emailVerified  DateTime?
   image          String?
   hashedPassword String?
+  role           String    @default("user") // "admin" or "user"
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
   accounts       Account[]
+  purchases      Purchase[]
+  hasAccess      Boolean    @default(false)
+  referralCodes  ReferralCode[]
+  referralUses   ReferralUse[]
 }
 
 model Account {
@@ -39,4 +44,75 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+}
+
+model Purchase {
+  id            String   @id @default(cuid())
+  userId        String
+  amount        Int
+  currency      String   @default("usd")
+  status        String   // pending, completed, failed
+  paymentId     String?  // Stripe payment intent ID
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  accessGranted Boolean  @default(false)
+  referralUse   ReferralUse?
+  commission    Commission?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ReferralCode {
+  id              String       @id @default(cuid())
+  code            String       @unique
+  userId          String
+  discountPercent Int         // 0-100
+  commissionRate  Int         // 0-100
+  isActive        Boolean     @default(true)
+  maxUses         Int?
+  expiresAt       DateTime?
+  oneTimePerUser  Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  uses           ReferralUse[]
+  commissions    Commission[]
+}
+
+model ReferralUse {
+  id              String       @id @default(cuid())
+  referralCodeId  String
+  userId          String
+  purchaseId      String      @unique
+  discountAmount  Int         // in cents
+  finalPrice      Int         // in cents
+  createdAt       DateTime    @default(now())
+
+  referralCode    ReferralCode @relation(fields: [referralCodeId], references: [id])
+  user            User         @relation(fields: [userId], references: [id])
+  purchase        Purchase     @relation(fields: [purchaseId], references: [id])
+}
+
+model Commission {
+  id              String       @id @default(cuid())
+  referralCodeId  String
+  purchaseId      String      @unique
+  amount          Int         // in cents
+  status          String      // pending, paid, cancelled
+  paidAt          DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  referralCode    ReferralCode @relation(fields: [referralCodeId], references: [id])
+  purchase        Purchase     @relation(fields: [purchaseId], references: [id])
+}
+
+model Settings {
+  id                    String    @id @default(cuid())
+  key                   String    @unique
+  value                 String
+  description          String?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
 }

@@ -3,18 +3,18 @@ import Link from "next/link";
 import Image from "next/image";
 import React from "react";
 
-export const Logo = () => {
+interface LogoProps {
+  className?: string;
+}
+
+export function Logo({ className }: LogoProps) {
   return (
-    <Link href="/" className="flex items-center relative z-20">
-      <div className="w-[200px] h-[60px] rounded-lg relative">
-        <Image 
-          src="/logos/jiffoo-logo.svg"
-          alt="Jiffoo Logo"
-          fill
-          className="object-contain p-2"
-          priority
-        />
-      </div>
-    </Link>
+    <Image
+      src="/logos/jiffoo-logo.svg"
+      alt="Jiffoo Logo"
+      width={120}
+      height={40}
+      className={className}
+    />
   );
-};
+}
