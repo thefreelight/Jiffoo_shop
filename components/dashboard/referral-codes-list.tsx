@@ -71,10 +71,6 @@ export function ReferralCodesList({ referralCodes, basePrice }: ReferralCodesLis
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-black dark:text-white">Your Referral Code</h2>
-      </div>
-
       {isEditing && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 rounded-xl p-6 max-w-md w-full mx-4">

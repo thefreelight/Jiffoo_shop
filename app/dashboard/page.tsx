@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
+import { OrdersList } from "@/components/dashboard/orders-list";
 
 interface ReferralCode {
   id: string;
@@ -30,15 +31,40 @@ export default async function DashboardPage() {
   }
 
   // Fetch user's referral codes and commission data
-  const referralCodes = await prisma.referralCode.findMany({
-    where: {
-      userId: session.user.id,
-    },
-    include: {
-      uses: true,
-      commissions: true,
-    },
-  });
+  const [referralCodes, orders] = await Promise.all([
+    prisma.referralCode.findMany({
+      where: {
+        userId: session.user.id,
+      },
+      include: {
+        uses: true,
+        commissions: true,
+      },
+    }),
+    prisma.purchase.findMany({
+      where: {
+        userId: session.user.id,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        referralUse: {
+          include: {
+            referralCode: {
+              include: {
+                user: {
+                  select: {
+                    email: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    }),
+  ]);
 
   // Calculate total stats
   const stats = referralCodes.reduce((acc: {
@@ -68,11 +94,33 @@ export default async function DashboardPage() {
       <DashboardHeader />
       <Container className="py-10">
         <div className="space-y-10">
+          <div>
+            <h1 className="text-2xl font-bold mb-2">Dashboard</h1>
+            <p className="text-muted dark:text-muted-dark">
+              Manage your orders and referral codes
+            </p>
+          </div>
+          
           <CommissionStats stats={stats} />
-          <ReferralCodesList 
-            referralCodes={referralCodes}
-            basePrice={9900}
-          />
+          
+          <div className="grid gap-6 md:grid-cols-2">
+            <section>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold">Orders</h2>
+              </div>
+              <OrdersList orders={orders} />
+            </section>
+            
+            <section>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold">Referral Code</h2>
+              </div>
+              <ReferralCodesList 
+                referralCodes={referralCodes}
+                basePrice={9900}
+              />
+            </section>
+          </div>
         </div>
       </Container>
     </div>
