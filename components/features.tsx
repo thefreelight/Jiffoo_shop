@@ -1,124 +1,88 @@
-import React from "react";
+"use client";
+
 import { Heading } from "./heading";
 import { Subheading } from "./subheading";
-import { cn } from "@/lib/utils";
-import { GridLineHorizontal, GridLineVertical } from "./grid-lines";
-import { SkeletonOne } from "./skeletons/first";
-import { SkeletonTwo } from "./skeletons/second";
-import { SkeletonFour } from "./skeletons/fourth";
-import { SkeletonThree } from "./skeletons/third";
+import Image from "next/image";
 
 export const Features = () => {
-  const features = [
-    {
-      title: "Generate images with text",
-      description:
-        "Generate images from a text prompt, a video, or a video segment in bulk at the speed of light.",
-      skeleton: <SkeletonOne />,
-      className:
-        "col-span-1 md:col-span-4 border-b border-r dark:border-neutral-800",
-    },
-    {
-      title: "Create stupid simple chatbots",
-      description:
-        "Create Chatbots with a single button click. Customize as per your requirements and the AI will take care of the rest.",
-      skeleton: <SkeletonTwo />,
-      className: "border-b col-span-1 md:col-span-2 dark:border-neutral-800",
-    },
-    {
-      title: "We support every single LLM",
-      description:
-        "Whether it's OpenAI, GroQ or Your Mom's Basement LLM, we support everything.",
-      skeleton: <SkeletonThree />,
-      className: "col-span-1 md:col-span-3 border-r dark:border-neutral-800",
-    },
-    {
-      title: "Deploy in seconds",
-      description:
-        "With our blazing fast, state of the art, cutting edge, we are so back cloud servies (read AWS) - you can deploy your model in seconds.",
-      skeleton: <SkeletonFour />,
-      className: "col-span-1 md:col-span-3",
-    },
-  ];
   return (
-    <div className="relative z-20 py-10 md:py-40">
-      <Heading as="h2">Packed with thousands of features</Heading>
-      <Subheading className="text-center ">
-        From Image generation to video generation, Everything AI has APIs for
-        literally everything. It can even create this website copy for you.
-      </Subheading>
-
-      <div className="relative">
-        <div className="grid grid-cols-1 md:grid-cols-6 mt-12">
-          {features.map((feature) => (
-            <FeatureCard key={feature.title} className={feature.className}>
-              <FeatureTitle>{feature.title}</FeatureTitle>
-              <FeatureDescription>{feature.description}</FeatureDescription>
-              <div className=" h-full w-full">{feature.skeleton}</div>
-            </FeatureCard>
-          ))}
+    <div className="relative z-20 py-20 overflow-hidden">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-16">
+          <Heading as="h2">Launch AI Apps at Lightning Speed</Heading>
+          <Subheading>
+            Jiffoo provides battle-tested AI application source code,
+            helping developers and businesses launch production-ready AI solutions in minutes, not months.
+          </Subheading>
         </div>
-        <GridLineHorizontal
-          style={{
-            top: 0,
-            left: "-10%",
-            width: "120%",
-          }}
-        />
 
-        <GridLineHorizontal
-          style={{
-            bottom: 0,
-            left: "-10%",
-            width: "120%",
-          }}
-        />
+        <div className="grid md:grid-cols-2 gap-16">
+          {/* Ready-to-Use Code Feature */}
+          <div className="space-y-6">
+            <h3 className="text-2xl font-bold">Production-Ready AI Source Code</h3>
+            <p className="text-muted dark:text-muted-dark">
+              Skip months of development with our curated collection of AI applications.
+              Each codebase is thoroughly tested, documented, and ready for immediate deployment.
+            </p>
+            <div className="space-y-4">
+              <div className="relative h-[300px] rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+                <Image
+                  src="https://images.unsplash.com/photo-1555066931-4365d14bab8c"
+                  alt="Clean Code Example"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="relative h-[300px] rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+                <Image
+                  src="https://images.unsplash.com/photo-1671726203638-83742a2721a1"
+                  alt="AI Application Example"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+            </div>
+          </div>
 
-        <GridLineVertical
-          style={{
-            top: "-10%",
-            right: 0,
-            height: "120%",
-          }}
-        />
-        <GridLineVertical
-          style={{
-            top: "-10%",
-            left: 0,
-            height: "120%",
-          }}
-        />
+          {/* Quick Launch Feature */}
+          <div className="space-y-6">
+            <h3 className="text-2xl font-bold">Deploy in Minutes</h3>
+            <p className="text-muted dark:text-muted-dark">
+              From chatbots to image generators, get your AI application up and running instantly.
+              Just clone, configure, and launch.
+            </p>
+            <div className="relative h-[640px] rounded-2xl overflow-hidden bg-white dark:bg-gray-800 p-6 shadow-lg">
+              <div className="space-y-4">
+                <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                  <p className="text-sm">$ git clone jiffoo/ai-chatbot-template</p>
+                </div>
+                <div className="bg-black text-white p-4 rounded-lg">
+                  <p className="text-sm">Cloning into 'ai-chatbot-template'...</p>
+                  <p className="text-sm">Done in 2.1s</p>
+                </div>
+                <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                  <p className="text-sm">$ cd ai-chatbot-template && yarn install</p>
+                </div>
+                <div className="bg-black text-white p-4 rounded-lg">
+                  <p className="text-sm">Installing dependencies...</p>
+                  <p className="text-sm">✨ Done in 18.2s</p>
+                </div>
+                <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-lg">
+                  <p className="text-sm">$ yarn dev</p>
+                </div>
+                <div className="bg-black text-white p-4 rounded-lg">
+                  <p className="text-sm">🚀 Ready on http://localhost:3000</p>
+                  <p className="text-sm text-gray-400">Your AI chatbot is now live!</p>
+                </div>
+                <div className="bg-emerald-50 dark:bg-emerald-900 p-4 rounded-lg">
+                  <p className="text-sm font-medium text-emerald-700 dark:text-emerald-300">Time to production: 3 minutes</p>
+                  <p className="text-xs text-emerald-600 dark:text-emerald-400">Saved 720 hours of development time</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  );
-};
-
-const FeatureCard = ({
-  children,
-  className,
-}: {
-  children?: React.ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={cn(`p-4 sm:p-8 relative overflow-hidden`, className)}>
-      {children}
-    </div>
-  );
-};
-
-const FeatureTitle = ({ children }: { children?: React.ReactNode }) => {
-  return (
-    <Heading as="h3" size="sm" className="text-left">
-      {children}
-    </Heading>
-  );
-};
-
-const FeatureDescription = ({ children }: { children?: React.ReactNode }) => {
-  return (
-    <Subheading className="text-left max-w-sm mx-0 md:text-sm my-2">
-      {children}
-    </Subheading>
   );
 };

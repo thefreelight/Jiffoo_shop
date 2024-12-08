@@ -1,65 +1,61 @@
 import { cn } from "@/lib/utils";
 import {
-  IconAdjustmentsBolt,
-  IconCloud,
-  IconCurrencyDollar,
-  IconEaseInOut,
-  IconHeart,
-  IconHelp,
-  IconRouteAltLeft,
   IconTerminal2,
+  IconBolt,
+  IconCurrencyDollar,
+  IconCloud,
+  IconUsers,
+  IconHeadset,
+  IconCode,
+  IconRocket
 } from "@tabler/icons-react";
 
 export const GridFeatures = () => {
   const features = [
     {
       title: "Built for developers",
-      description:
-        "Built for engineers, developers, dreamers, thinkers and doers.",
+      description: "Production-ready AI source code for developers who want to build and ship fast.",
       icon: <IconTerminal2 />,
     },
     {
-      title: "Ease of use",
-      description:
-        "It's as easy as using an Apple, and as expensive as buying one.",
-      icon: <IconEaseInOut />,
+      title: "Rapid deployment",
+      description: "Deploy your AI application in minutes, not months. Just clone, configure, and launch.",
+      icon: <IconRocket />,
     },
     {
-      title: "Pricing like no other",
-      description:
-        "Our prices are best in the market. No cap, no lock, no credit card required.",
+      title: "Transparent pricing",
+      description: "Clear one-time payment for each template. No subscriptions, no hidden fees.",
       icon: <IconCurrencyDollar />,
     },
     {
-      title: "100% Uptime guarantee",
-      description: "We just cannot be taken down by anyone.",
+      title: "Cloud-ready",
+      description: "All templates are tested and optimized for major cloud platforms.",
       icon: <IconCloud />,
     },
     {
-      title: "Multi-tenant Architecture",
-      description: "You can simply share passwords instead of buying new seats",
-      icon: <IconRouteAltLeft />,
+      title: "Modern tech stack",
+      description: "Built with the latest AI technologies and frameworks for optimal performance.",
+      icon: <IconCode />,
     },
     {
-      title: "24/7 Customer Support",
-      description:
-        "We are available a 100% of the time. Atleast our AI Agents are.",
-      icon: <IconHelp />,
+      title: "Developer support",
+      description: "Get technical assistance from our experienced AI engineers.",
+      icon: <IconHeadset />,
     },
     {
-      title: "Money back guarantee",
-      description:
-        "If you donot like EveryAI, we will convince you to like us.",
-      icon: <IconAdjustmentsBolt />,
+      title: "Active community",
+      description: "Join a growing community of developers building amazing AI applications.",
+      icon: <IconUsers />,
     },
     {
-      title: "And everything else",
-      description: "I just ran out of copy ideas. Accept my sincere apologies",
-      icon: <IconHeart />,
+      title: "Regular updates",
+      description: "Continuous improvements and new features to stay ahead in AI development.",
+      icon: <IconBolt />,
     },
   ];
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4  relative z-10 py-10">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 relative z-10 py-10">
       {features.map((feature, index) => (
         <Feature key={feature.title} {...feature} index={index} />
       ))}
@@ -81,7 +77,7 @@ const Feature = ({
   return (
     <div
       className={cn(
-        "flex flex-col lg:border-r  py-10 relative group dark:border-neutral-800",
+        "flex flex-col lg:border-r py-10 relative group dark:border-neutral-800",
         (index === 0 || index === 4) && "lg:border-l dark:border-neutral-800",
         index < 4 && "lg:border-b dark:border-neutral-800"
       )}
