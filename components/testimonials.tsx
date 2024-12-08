@@ -12,8 +12,8 @@ export const Testimonials = () => {
     <div className="relative z-20 py-10 md:py-40">
       <Heading as="h2">Loved by people all over the universe</Heading>
       <Subheading className="text-center max-w-lg mx-auto">
-        Every AI is used by millions of people around the globe.Our APIs have
-        fan bases and people fight for us over twitter.
+        Jiffoo helps developers worldwide launch AI applications faster than ever.
+        Our templates power thousands of applications across the globe.
       </Subheading>
       <TestimonialGrid />
     </div>
