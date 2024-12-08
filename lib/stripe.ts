@@ -3,6 +3,8 @@ import { validateReferralCode, calculateDiscountedPrice } from './referral';
 import prisma from '@/lib/prisma';
 import { inviteUserToRepo } from './github';
 import { PrismaClient } from '@prisma/client';
+import { sendWelcomeEmail, sendGitHubInvitationEmail, sendGitHubUsernameRequestEmail } from './email';
+import { getRepoUrl } from './github';
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
@@ -122,16 +124,41 @@ export async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
         console.log('Referral and commission records created');
       }
 
-      // Send GitHub repository invitation
+      // Send welcome email and GitHub invitation
       if (user.email) {
+        // Send welcome email first
+        try {
+          console.log('Sending welcome email to:', user.email);
+          await sendWelcomeEmail(user.email, user.name || 'there');
+          console.log('Welcome email sent successfully');
+        } catch (error) {
+          console.error('Error sending welcome email:', error);
+          // Continue with the process even if welcome email fails
+        }
+
+        // Try to send GitHub invitation
         try {
           console.log('Sending GitHub invitation to:', user.email);
           await inviteUserToRepo(user.email);
           console.log('GitHub invitation sent successfully');
-        } catch (error) {
-          console.error('Failed to send GitHub invitation:', error);
-          // Don't throw error here to avoid rolling back the transaction
-          // We can handle this separately
+
+          // Only send GitHub invitation email if the invitation was successful
+          console.log('Sending GitHub invitation email to:', user.email);
+          await sendGitHubInvitationEmail(user.email, user.name || 'there', getRepoUrl());
+          console.log('GitHub invitation email sent successfully');
+        } catch (error: any) {
+          if (error.message === 'GitHub account not found with this email') {
+            console.log('No GitHub account found for email:', user.email);
+            // Send a different email asking user to provide their GitHub username
+            try {
+              await sendGitHubUsernameRequestEmail(user.email, user.name || 'there');
+              console.log('GitHub username request email sent successfully');
+            } catch (emailError) {
+              console.error('Error sending GitHub username request email:', emailError);
+            }
+          } else {
+            console.error('Error with GitHub invitation process:', error);
+          }
         }
       }
     });
