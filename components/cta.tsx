@@ -33,17 +33,16 @@ export const CTA = () => {
 
             <div className="relative px-6 pb-14 pt-20 sm:px-10 sm:pb-20 lg:px-[4.5rem]">
               <h2 className="text-center text-balance mx-auto text-3xl md:text-5xl font-semibold tracking-[-0.015em] text-white">
-                Ready to signup and join the waitlist?
+                Ready to build your own AI directory?
               </h2>
               <p className="mt-4 max-w-[26rem] text-center mx-auto text-base/6 text-neutral-200">
                 <Balancer>
-                  Get instant access to our state of the art project and join
-                  the waitlist.
+                  Get started with Jiffoo today and create a beautiful, modern directory for your AI tools.
                 </Balancer>
               </p>
 
               <div className="relative z-10 mx-auto flex justify-center mt-6">
-                <Button onClick={handleJoinWaitlist}>Join Waitlist</Button>
+                <Button onClick={handleJoinWaitlist} className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">Get Started</Button>
               </div>
             </div>
           </div>

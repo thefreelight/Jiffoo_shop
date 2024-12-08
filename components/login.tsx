@@ -105,7 +105,7 @@ export function LoginForm() {
                       <FormItem>
                         <label
                           htmlFor="email"
-                          className="block text-sm font-medium leading-6 text-neutral-700 dark:text-muted-dark"
+                          className="block text-sm font-medium leading-6 text-neutral-700 dark:text-neutral-300"
                         >
                           Email address
                         </label>
@@ -115,7 +115,7 @@ export function LoginForm() {
                               id="email"
                               type="email"
                               placeholder="hello@johndoe.com"
-                              className="block w-full bg-white dark:bg-neutral-900 px-4 rounded-md border-0 py-1.5  shadow-aceternity text-black placeholder:text-gray-400 focus:ring-2 focus:ring-neutral-400 focus:outline-none sm:text-sm sm:leading-6 dark:text-white"
+                              className="block w-full bg-white dark:bg-neutral-900 px-4 rounded-md border border-neutral-200 dark:border-neutral-800 py-1.5 text-black dark:text-white placeholder:text-neutral-400 focus:ring-2 focus:ring-[#0aa6fd] focus:border-transparent focus:outline-none sm:text-sm sm:leading-6"
                               {...field}
                             />
                           </div>
@@ -134,7 +134,7 @@ export function LoginForm() {
                       <FormItem>
                         <label
                           htmlFor="password"
-                          className="block text-sm font-medium leading-6 text-neutral-700 dark:text-muted-dark"
+                          className="block text-sm font-medium leading-6 text-neutral-700 dark:text-neutral-300"
                         >
                           Password
                         </label>
@@ -144,7 +144,7 @@ export function LoginForm() {
                               id="password"
                               type="password"
                               placeholder="••••••••"
-                              className="block w-full bg-white dark:bg-neutral-900 px-4 rounded-md border-0 py-1.5  shadow-aceternity text-black placeholder:text-gray-400 focus:ring-2 focus:ring-neutral-400 focus:outline-none sm:text-sm sm:leading-6 dark:text-white"
+                              className="block w-full bg-white dark:bg-neutral-900 px-4 rounded-md border border-neutral-200 dark:border-neutral-800 py-1.5 text-black dark:text-white placeholder:text-neutral-400 focus:ring-2 focus:ring-[#0aa6fd] focus:border-transparent focus:outline-none sm:text-sm sm:leading-6"
                               {...field}
                             />
                           </div>
@@ -164,14 +164,14 @@ export function LoginForm() {
                 </div>
 
                 <div>
-                  <Button className="w-full">Sign in</Button>
+                  <Button className="w-full bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">Sign in</Button>
                   <p
                     className={cn(
                       "text-sm text-neutral-500 text-center mt-4 text-muted dark:text-muted-dark"
                     )}
                   >
                     Don&apos;t have an account?{" "}
-                    <Link href="/signup" className="text-black dark:text-white">
+                    <Link href="/signup" className="text-[#0aa6fd] hover:text-[#2a2bdb] transition-colors duration-200">
                       Sign up
                     </Link>
                   </p>
@@ -195,7 +195,7 @@ export function LoginForm() {
               </div>
 
               <div className="mt-6 w-full flex items-center justify-center">
-                <Button onClick={() => {}} className="w-full py-1.5">
+                <Button onClick={() => {}} className="w-full py-1.5 bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">
                   <IconBrandGithub className="h-5 w-5" />
                   <span className="text-sm font-semibold leading-6">
                     Github

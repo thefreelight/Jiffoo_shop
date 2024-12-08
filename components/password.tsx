@@ -22,7 +22,7 @@ function Password(props: PasswordProps) {
       <input
         id="password"
         autoComplete="current-password"
-        className="block w-full bg-brand-dark-input rounded-md border-0 py-1.5 shadow-sm ring-1 ring-inset ring-zinc-800 text-white placeholder:text-gray-400 focus:ring-2 focus:ring-neutral-400 focus:outline-none sm:text-sm sm:leading-6"
+        className="block w-full bg-white dark:bg-neutral-900 px-4 rounded-md border border-neutral-200 dark:border-neutral-800 py-1.5 text-black dark:text-white placeholder:text-neutral-400 focus:ring-2 focus:ring-[#0aa6fd] focus:border-transparent focus:outline-none sm:text-sm sm:leading-6"
         {...props}
         type={show ? "text" : "password"}
       />
@@ -30,13 +30,13 @@ function Password(props: PasswordProps) {
         {!show && (
           <EyeIcon
             onClick={() => setShow(true)}
-            className="text-gray-400 cursor-pointer h-4"
+            className="text-neutral-400 cursor-pointer h-4 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
           />
         )}
         {show && (
           <EyeOffIcon
             onClick={() => setShow(false)}
-            className="text-gray-400 cursor-pointer h-4"
+            className="text-neutral-400 cursor-pointer h-4 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
           />
         )}
       </div>

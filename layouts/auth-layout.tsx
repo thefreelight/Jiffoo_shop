@@ -18,15 +18,14 @@ export function AuthLayout({ children }: { children: React.ReactNode }) {
                 "font-semibold text-xl text-center text-muted dark:text-muted-dark"
               )}
             >
-              Every AI is used by thousands of users
+              Build Your Own AI Application with Jiffoo
             </p>
             <p
               className={cn(
                 "font-normal text-base text-center text-neutral-500 dark:text-neutral-400 mt-8"
               )}
             >
-              With lots of AI applications around, Everything AI stands out with
-              its state of the art Shitposting capabilities.
+              Launch your AI application in minutes with our modern, customizable template. Beautiful UI, ready for your brand.
             </p>
           </div>
           <HorizontalGradient className="top-20" />
