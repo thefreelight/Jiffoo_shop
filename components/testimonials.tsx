@@ -10,7 +10,7 @@ import Image from "next/image";
 export const Testimonials = () => {
   return (
     <div className="relative z-20 py-10 md:py-40">
-      <Heading as="h2">Loved by people all over the universe</Heading>
+      <Heading as="h2" className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-transparent bg-clip-text">Loved by people all over the universe</Heading>
       <Subheading className="text-center max-w-lg mx-auto">
         Jiffoo helps developers worldwide launch AI applications faster than ever.
         Our templates power thousands of applications across the globe.
@@ -211,7 +211,7 @@ function Testimonial({
   return (
     <figure
       className={cn(
-        "animate-fade-in rounded-3xl bg-transparent p-8 opacity-0 shadow-derek dark:bg-neutral-900",
+        "animate-fade-in rounded-3xl bg-transparent p-8 opacity-0 shadow-derek dark:bg-neutral-900 hover:bg-gradient-to-r hover:from-[#0aa6fd]/5 hover:to-[#2a2bdb]/5 transition-all duration-500",
         className
       )}
       style={{

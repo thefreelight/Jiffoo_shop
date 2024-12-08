@@ -9,7 +9,7 @@ export const Features = () => {
     <div className="relative z-20 py-20 overflow-hidden">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <Heading as="h2">Launch AI Apps at Lightning Speed</Heading>
+          <Heading as="h2" className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-transparent bg-clip-text">Launch AI Apps at Lightning Speed</Heading>
           <Subheading>
             Jiffoo provides battle-tested AI application source code,
             helping developers and businesses launch production-ready AI solutions in minutes, not months.
@@ -19,7 +19,7 @@ export const Features = () => {
         <div className="grid md:grid-cols-2 gap-16">
           {/* Ready-to-Use Code Feature */}
           <div className="space-y-6">
-            <h3 className="text-2xl font-bold">Production-Ready AI Source Code</h3>
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-transparent bg-clip-text">Production-Ready AI Source Code</h3>
             <p className="text-muted dark:text-muted-dark">
               Skip months of development with our curated collection of AI applications.
               Each codebase is thoroughly tested, documented, and ready for immediate deployment.
@@ -46,7 +46,7 @@ export const Features = () => {
 
           {/* Quick Launch Feature */}
           <div className="space-y-6">
-            <h3 className="text-2xl font-bold">Deploy in Minutes</h3>
+            <h3 className="text-2xl font-bold bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-transparent bg-clip-text">Deploy in Minutes</h3>
             <p className="text-muted dark:text-muted-dark">
               From chatbots to image generators, get your AI application up and running instantly.
               Just clone, configure, and launch.

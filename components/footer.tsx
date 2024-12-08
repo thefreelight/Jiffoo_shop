@@ -93,8 +93,8 @@ export const Footer = () => {
           </div>
         </div>
       </div>
-      <p className="text-center text-5xl md:text-9xl lg:text-[18rem] font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 dark:from-neutral-950 to-neutral-200 dark:to-neutral-800 inset-x-0">
-        EVERY AI
+      <p className="text-center text-5xl md:text-9xl lg:text-[18rem] font-bold bg-clip-text text-transparent bg-gradient-to-b from-[#0aa6fd] to-[#2a2bdb] inset-x-0">
+        JIFFOO
       </p>
     </div>
   );
