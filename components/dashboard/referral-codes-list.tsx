@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { Button } from "../button";
-import { IconPlus, IconTrash, IconEdit } from "@tabler/icons-react";
+import { IconEdit, IconX } from "@tabler/icons-react";
+import { toast } from "sonner";
 
 interface ReferralCode {
   id: string;
@@ -10,8 +11,6 @@ interface ReferralCode {
   discountPercent: number;
   commissionRate: number;
   isActive: boolean;
-  maxUses: number | null;
-  expiresAt: Date | null;
   uses: Array<any>;
   commissions: Array<{
     status: string;
@@ -25,112 +24,136 @@ interface ReferralCodesListProps {
 }
 
 export function ReferralCodesList({ referralCodes, basePrice }: ReferralCodesListProps) {
-  const [isCreating, setIsCreating] = useState(false);
-  const [isEditing, setIsEditing] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [newCode, setNewCode] = useState("");
 
-  const handleCreate = () => {
-    setIsCreating(true);
-  };
-
-  const handleEdit = (id: string) => {
-    setIsEditing(id);
-  };
-
-  const handleDelete = async (id: string) => {
+  const handleUpdateCode = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      const response = await fetch(`/api/referral/delete`, {
-        method: "POST",
+      const response = await fetch('/api/referral/update', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({
+          code: newCode,
+        }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete referral code");
+        const error = await response.text();
+        throw new Error(error);
       }
 
-      // Refresh the page to show updated data
+      toast.success('Referral code updated successfully');
+      setIsEditing(false);
       window.location.reload();
     } catch (error) {
-      console.error("Error deleting referral code:", error);
+      console.error('Error updating referral code:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to update referral code');
     }
   };
+
+  const code = referralCodes[0]; // We know there's only one code per user
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-black dark:text-white">Your Referral Codes</h2>
-        <Button onClick={handleCreate} className="flex items-center gap-2">
-          <IconPlus className="h-4 w-4" />
-          Create New Code
-        </Button>
+        <h2 className="text-xl font-bold text-black dark:text-white">Your Referral Code</h2>
       </div>
 
-      <div className="grid gap-4">
-        {referralCodes.map((code) => (
-          <div
-            key={code.id}
-            className="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 rounded-xl p-6"
-          >
-            <div className="flex items-center justify-between">
+      {isEditing && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Customize Your Referral Code</h3>
+              <Button
+                variant="outline"
+                onClick={() => setIsEditing(false)}
+                className="p-2"
+              >
+                <IconX className="h-4 w-4" />
+              </Button>
+            </div>
+            <form onSubmit={handleUpdateCode} className="space-y-4">
               <div>
-                <div className="flex items-center gap-4">
-                  <h3 className="text-lg font-semibold text-black dark:text-white">
-                    {code.code}
-                  </h3>
-                  <span
-                    className={`px-2 py-1 text-xs font-medium rounded-full ${
-                      code.isActive
-                        ? "bg-green-100 text-green-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {code.isActive ? "Active" : "Inactive"}
-                  </span>
-                </div>
-                <div className="mt-2 grid grid-cols-3 gap-4 text-sm text-neutral-600 dark:text-neutral-400">
-                  <div>
-                    <p>Discount</p>
-                    <p className="font-medium text-black dark:text-white">
-                      {code.discountPercent}%
-                    </p>
-                  </div>
-                  <div>
-                    <p>Commission Rate</p>
-                    <p className="font-medium text-black dark:text-white">
-                      {code.commissionRate}%
-                    </p>
-                  </div>
-                  <div>
-                    <p>Uses</p>
-                    <p className="font-medium text-black dark:text-white">
-                      {code.uses.length}
-                      {code.maxUses ? `/${code.maxUses}` : ""}
-                    </p>
-                  </div>
-                </div>
+                <label className="block text-sm font-medium mb-1">New Code</label>
+                <input
+                  type="text"
+                  value={newCode}
+                  onChange={(e) => setNewCode(e.target.value.toUpperCase())}
+                  placeholder="Enter new code (minimum 4 characters)"
+                  className="w-full px-3 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black focus:outline-none focus:ring-2 focus:ring-[#0aa6fd]"
+                  minLength={4}
+                  required
+                />
+                <p className="mt-2 text-sm text-neutral-500">
+                  Your referral code must be at least 4 characters long and can only contain letters and numbers.
+                </p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex gap-2 justify-end mt-6">
                 <Button
                   variant="outline"
-                  onClick={() => handleEdit(code.id)}
+                  onClick={() => setIsEditing(false)}
+                  type="button"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500"
+                >
+                  Update Code
+                </Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {code && (
+        <div className="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 rounded-xl p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-4">
+                <h3 className="text-lg font-semibold text-black dark:text-white">
+                  {code.code}
+                </h3>
+                <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                  Active
+                </span>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsEditing(true)}
                   className="p-2"
                 >
                   <IconEdit className="h-4 w-4" />
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => handleDelete(code.id)}
-                  className="p-2 text-red-600 hover:text-red-700"
-                >
-                  <IconTrash className="h-4 w-4" />
-                </Button>
+              </div>
+              <div className="mt-2 grid grid-cols-3 gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+                <div>
+                  <p>Discount</p>
+                  <p className="font-medium text-black dark:text-white">
+                    {code.discountPercent}%
+                  </p>
+                </div>
+                <div>
+                  <p>Commission Rate</p>
+                  <p className="font-medium text-black dark:text-white">
+                    {code.commissionRate}%
+                  </p>
+                </div>
+                <div>
+                  <p>Uses</p>
+                  <p className="font-medium text-black dark:text-white">
+                    {code.uses.length}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 } 

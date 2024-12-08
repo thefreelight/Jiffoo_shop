@@ -1,5 +1,59 @@
 import prisma from './prisma';
 
+export function generateReferralCode(length: number = 8): string {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let code = '';
+  for (let i = 0; i < length; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code;
+}
+
+export async function validateCustomCode(code: string): Promise<{ valid: boolean; error?: string }> {
+  // Check minimum length
+  if (code.length < 4) {
+    return { valid: false, error: 'Code must be at least 4 characters long' };
+  }
+
+  // Check if code already exists
+  const existingCode = await prisma.referralCode.findUnique({
+    where: { code },
+  });
+
+  if (existingCode) {
+    return { valid: false, error: 'This code is already taken' };
+  }
+
+  return { valid: true };
+}
+
+export async function updateReferralCode(userId: string, newCode: string) {
+  // Validate the new code
+  const validation = await validateCustomCode(newCode);
+  if (!validation.valid) {
+    throw new Error(validation.error);
+  }
+
+  // Find the user's current referral code
+  const currentCode = await prisma.referralCode.findFirst({
+    where: { userId },
+  });
+
+  if (!currentCode) {
+    throw new Error('No referral code found for this user');
+  }
+
+  // Update the code
+  return prisma.referralCode.update({
+    where: {
+      id: currentCode.id,
+    },
+    data: {
+      code: newCode.toUpperCase(),
+    },
+  });
+}
+
 export async function validateReferralCode(code: string, userId: string) {
   const referralCode = await prisma.referralCode.findUnique({
     where: { code },
@@ -16,30 +70,34 @@ export async function validateReferralCode(code: string, userId: string) {
     return { valid: false, error: 'This referral code is inactive' };
   }
 
-  if (referralCode.expiresAt && referralCode.expiresAt < new Date()) {
-    return { valid: false, error: 'This referral code has expired' };
-  }
-
-  if (referralCode.maxUses && referralCode.uses.length >= referralCode.maxUses) {
-    return { valid: false, error: 'This referral code has reached its maximum uses' };
-  }
-
-  if (referralCode.oneTimePerUser) {
-    const previousUse = await prisma.referralUse.findFirst({
-      where: {
-        referralCodeId: referralCode.id,
-        userId,
-      },
-    });
-
-    if (previousUse) {
-      return { valid: false, error: 'You have already used this referral code' };
-    }
+  if (referralCode.userId === userId) {
+    return { valid: false, error: 'You cannot use your own referral code' };
   }
 
   return {
     valid: true,
     referralCode,
+  };
+}
+
+export async function getReferralRates(userRole: string = 'user'): Promise<{
+  discountPercent: number;
+  commissionRate: number;
+}> {
+  // Get rates from settings based on user role
+  const [discountSetting, commissionSetting] = await Promise.all([
+    prisma.settings.findUnique({
+      where: { key: `${userRole}_discount_percent` },
+    }),
+    prisma.settings.findUnique({
+      where: { key: `${userRole}_commission_rate` },
+    }),
+  ]);
+
+  // Default values if settings are not found
+  return {
+    discountPercent: discountSetting ? parseInt(discountSetting.value) : 20,
+    commissionRate: commissionSetting ? parseInt(commissionSetting.value) : 30,
   };
 }
 
@@ -115,13 +173,4 @@ export async function recordReferralUse(data: {
       },
     }),
   ]);
-}
-
-function generateReferralCode(length: number = 8): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let code = '';
-  for (let i = 0; i < length; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return code;
 } 
