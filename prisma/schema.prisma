@@ -116,3 +116,25 @@ model Settings {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt
 }
+
+model PricingConfig {
+  id            String    @id @default(cuid())
+  originalPrice Int      // in cents
+  currentPrice  Int      // in cents
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  features      Feature[]
+}
+
+model Feature {
+  id              String        @id @default(cuid())
+  title           String
+  description     String
+  order           Int
+  pricingConfigId String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  pricingConfig   PricingConfig @relation(fields: [pricingConfigId], references: [id], onDelete: Cascade)
+}

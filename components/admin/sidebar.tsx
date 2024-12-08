@@ -10,6 +10,7 @@ import {
   IconCreditCard,
   IconSettings,
   IconChartBar,
+  IconTags,
 } from "@tabler/icons-react";
 import { Logo } from "../Logo";
 
@@ -38,6 +39,11 @@ const navigation = [
     name: "Analytics",
     href: "/admin/analytics",
     icon: IconChartBar,
+  },
+  {
+    name: "Pricing",
+    href: "/admin/pricing",
+    icon: IconTags,
   },
   {
     name: "Settings",
