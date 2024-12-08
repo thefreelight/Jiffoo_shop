@@ -86,11 +86,13 @@ export const Hero = () => {
         }}
         className="flex items-center gap-4 justify-center mt-6 relative z-10"
       >
-        <Button className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">Get Source Code</Button>
+        <Button as={Link} href="/pricing" className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">Get Source Code</Button>
         <Button
           variant="simple"
-          as={Link}
-          href="/contact"
+          as="a"
+          href="https://navtoai.com"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex space-x-2 items-center group text-[#0aa6fd] hover:text-[#2a2bdb] transition-colors duration-200"
         >
           <span>View Demo</span>
