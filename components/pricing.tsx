@@ -1,131 +1,64 @@
 "use client";
 import { IconCircleCheckFilled } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
-import { tiers } from "@/constants/tier";
-import { useState } from "react";
-import { motion } from "framer-motion";
 import { Button } from "./button";
 
 export function Pricing() {
-  const [active, setActive] = useState("monthly");
-  const tabs = [
-    { name: "Monthly", value: "monthly" },
-    { name: "Yearly", value: "yearly" },
+  const features = [
+    "Full source code access",
+    "Modern tech stack (Next.js 14, React, Tailwind)",
+    "Beautiful UI components",
+    "Authentication & user management",
+    "Database integration",
+    "API integration examples",
+    "Deployment guides",
+    "Premium email support",
+    "Private Discord access",
+    "Lifetime updates",
   ];
 
   return (
-    <div className="relative">
-      <div className="flex items-center justify-center bg-neutral-100 dark:bg-neutral-800  w-fit mx-auto mb-12 rounded-md overflow-hidden">
-        {tabs.map((tab) => (
-          <button
-            key={tab.value}
-            className={cn(
-              "text-sm font-medium text-gray-500 dark:text-muted-dark p-4  rounded-md relative",
-              active === tab.value ? " text-white dark:text-black" : ""
-            )}
-            onClick={() => setActive(tab.value)}
-          >
-            {active === tab.value && (
-              <motion.span
-                layoutId="moving-div"
-                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                className="absolute inset-0 bg-black dark:bg-white"
-              />
-            )}
-            <span className="relative z-10">{tab.name}</span>
-          </button>
-        ))}
-      </div>
-      <div className="mx-auto mt-4 md:mt-20   grid relative z-20 grid-cols-1 gap-4 items-center  md:grid-cols-2 xl:grid-cols-4">
-        {tiers.map((tier, tierIdx) => (
-          <div
-            key={tier.id}
-            className={cn(
-              tier.featured
-                ? "relative bg-[radial-gradient(164.75%_100%_at_50%_0%,#334155_0%,#0F172A_48.73%)]  shadow-2xl"
-                : " bg-white dark:bg-black",
-              "rounded-lg px-6 py-8 sm:mx-8 lg:mx-0  h-full flex flex-col justify-between"
-            )}
-          >
-            <div className="">
-              <h3
-                id={tier.id}
-                className={cn(
-                  tier.featured
-                    ? "text-white"
-                    : "text-muted dark:text-muted-dark",
-                  "text-base font-semibold leading-7"
-                )}
-              >
-                {tier.name}
+    <div className="relative w-full max-w-2xl mx-auto">
+      <div className="mx-auto mt-4 md:mt-10">
+        <div className="relative bg-gradient-to-br from-[#0aa6fd]/10 to-[#2a2bdb]/10 rounded-2xl p-8 overflow-hidden">
+          <div className="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,white,rgba(255,255,255,0.6))] dark:[mask-image:linear-gradient(0deg,black,rgba(255,255,255,0.6))]" />
+          <div className="relative">
+            <div className="flex items-center justify-between">
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-transparent bg-clip-text">
+                Lifetime Access
               </h3>
-              <p className="mt-4">
-                <motion.span
-                  initial={{ x: -20, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ duration: 0.2, ease: "easeOut" }}
-                  key={active}
-                  className={cn(
-                    "text-4xl font-bold tracking-tight  inline-block",
-                    tier.featured
-                      ? "text-white"
-                      : "text-neutral-900 dark:text-neutral-200"
-                  )}
-                >
-                  {active === "monthly" ? tier.priceMonthly : tier.priceYearly}
-                </motion.span>
-              </p>
-              <p
-                className={cn(
-                  tier.featured
-                    ? "text-neutral-300"
-                    : "text-neutral-600 dark:text-neutral-300",
-                  "mt-6 text-sm leading-7  h-12 md:h-12 xl:h-12"
-                )}
-              >
-                {tier.description}
-              </p>
-              <ul
-                role="list"
-                className={cn(
-                  tier.featured
-                    ? "text-neutral-300"
-                    : "text-neutral-600 dark:text-neutral-300",
-                  "mt-8 space-y-3 text-sm leading-6 sm:mt-10"
-                )}
-              >
-                {tier.features.map((feature) => (
-                  <li key={feature} className="flex gap-x-3">
-                    <IconCircleCheckFilled
-                      className={cn(
-                        tier.featured
-                          ? "text-white"
-                          : "text-muted dark:text-muted-dark",
-                        "h-6 w-5 flex-none"
-                      )}
-                      aria-hidden="true"
-                    />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
+              <div className="flex flex-col items-end">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-xl line-through text-neutral-400">$299</span>
+                  <span className="text-4xl font-bold bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-transparent bg-clip-text">$99</span>
+                  <span className="text-neutral-600 dark:text-neutral-400">one-time</span>
+                </div>
+                <div className="text-sm text-[#0aa6fd] font-medium">
+                  Save $200 (67% off)
+                </div>
+              </div>
             </div>
-            <div>
-              <Button
-                onClick={tier.onClick}
-                aria-describedby={tier.id}
-                className={cn(
-                  tier.featured
-                    ? "bg-white text-black shadow-sm hover:bg-white/90 focus-visible:outline-white"
-                    : "",
-                  "mt-8 rounded-full py-2.5 px-3.5 text-center text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 sm:mt-10 block w-full"
-                )}
-              >
-                {tier.cta}
+            <p className="mt-4 text-neutral-600 dark:text-neutral-400">
+              Get instant access to our production-ready AI application source code and start building today.
+            </p>
+            <ul className="mt-8 space-y-4">
+              {features.map((feature) => (
+                <li key={feature} className="flex items-center gap-3">
+                  <IconCircleCheckFilled className="h-5 w-5 text-[#0aa6fd]" />
+                  <span className="text-neutral-700 dark:text-neutral-300">{feature}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8">
+              <Button className="w-full bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500 py-6 text-lg font-semibold">
+                Get Started Now
               </Button>
+              <p className="mt-4 text-sm text-center text-neutral-500">
+                30-day money-back guarantee • Instant access • Lifetime updates
+              </p>
             </div>
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );
