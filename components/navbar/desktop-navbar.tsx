@@ -23,7 +23,6 @@ type Props = {
 
 export const DesktopNavbar = ({ navItems }: Props) => {
   const { scrollY } = useScroll();
-
   const [showBackground, setShowBackground] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (value) => {
@@ -33,27 +32,15 @@ export const DesktopNavbar = ({ navItems }: Props) => {
       setShowBackground(false);
     }
   });
+  
   return (
     <div
       className={cn(
         "w-full flex relative justify-between px-4 py-2 rounded-full bg-transparent transition duration-200",
         showBackground &&
-          "bg-neutral-50 dark:bg-neutral-900 shadow-[0px_-2px_0px_0px_var(--neutral-100),0px_2px_0px_0px_var(--neutral-100)] dark:shadow-[0px_-2px_0px_0px_var(--neutral-800),0px_2px_0px_0px_var(--neutral-800)]"
+          "bg-white/30 dark:bg-neutral-900/30 backdrop-blur-sm border border-neutral-200/50 dark:border-neutral-800/50"
       )}
     >
-      <AnimatePresence>
-        {showBackground && (
-          <motion.div
-            key={String(showBackground)}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{
-              duration: 1,
-            }}
-            className="absolute inset-0 h-full w-full bg-neutral-100 dark:bg-neutral-800 pointer-events-none [mask-image:linear-gradient(to_bottom,white,transparent,white)] rounded-full"
-          />
-        )}
-      </AnimatePresence>
       <div className="flex flex-row gap-2 items-center">
         <Logo />
         <div className="flex items-center gap-1.5">
