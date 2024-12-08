@@ -10,8 +10,8 @@ const products = [
   {
     title: "NavToAI",
     description: "Launch your AI tools directory in minutes with our modern, customizable template.",
-    image: "/navtoai.png",
-    link: "/products/navtoai",
+    image: "/navtoai.png" as string,
+    link: "https://navtoai.com",
     comingSoon: false
   },
   {
@@ -76,8 +76,10 @@ export const ProductShowcase = () => {
                 </p>
                 <Button
                   variant="simple"
-                  as={Link}
+                  as="a"
                   href={product.link}
+                  target={!product.comingSoon ? "_blank" : undefined}
+                  rel={!product.comingSoon ? "noopener noreferrer" : undefined}
                   disabled={product.comingSoon}
                   className="flex space-x-2 items-center group text-[#0aa6fd] hover:text-[#2a2bdb] transition-colors duration-200"
                 >
