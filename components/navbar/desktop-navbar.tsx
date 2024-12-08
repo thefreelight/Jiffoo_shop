@@ -56,7 +56,7 @@ export const DesktopNavbar = ({ navItems }: Props) => {
         <Button variant="simple" as={Link} href="/login">
           Login
         </Button>
-        <Button as={Link} href="/signup">
+        <Button as={Link} href="/signup" className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">
           Sign Up
         </Button>
       </div>
