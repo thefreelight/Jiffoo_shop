@@ -26,7 +26,7 @@ function Password(props: PasswordProps) {
         {...props}
         type={show ? "text" : "password"}
       />
-      <div className="absolute right-3 top-[30%]">
+      <div className="absolute right-3 top-1/2 -translate-y-1/2">
         {!show && (
           <EyeIcon
             onClick={() => setShow(true)}

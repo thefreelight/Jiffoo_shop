@@ -7,13 +7,16 @@ import { PrismaAdapter } from "@auth/prisma-adapter"
 import { JWT } from "next-auth/jwt"
 
 interface ExtendedToken extends JWT {
-  id: string
+  id: string;
+  role?: string;
 }
 
 export const authOptions: AuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
+    // Regular user authentication
     CredentialsProvider({
+      id: "credentials",
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "text" },
@@ -26,7 +29,8 @@ export const authOptions: AuthOptions = {
 
         const user = await prisma.user.findUnique({
           where: {
-            email: credentials.email
+            email: credentials.email,
+            role: 'user', // Only allow regular users
           }
         });
 
@@ -51,12 +55,59 @@ export const authOptions: AuthOptions = {
           id: user.id,
           email: user.email,
           name: user.name,
+          role: user.role,
+        };
+      }
+    }),
+    // Admin authentication
+    CredentialsProvider({
+      id: "admin-credentials",
+      name: "Admin Login",
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error('Please enter both email and password');
+        }
+
+        const user = await prisma.user.findUnique({
+          where: {
+            email: credentials.email,
+            role: 'admin', // Only allow admin users
+          }
+        });
+
+        if (!user) {
+          throw new Error('Invalid admin credentials');
+        }
+
+        if (!user.hashedPassword) {
+          throw new Error('Please login with OAuth provider');
+        }
+
+        const isCorrectPassword = await bcrypt.compare(
+          credentials.password,
+          user.hashedPassword
+        );
+
+        if (!isCorrectPassword) {
+          throw new Error('Invalid admin credentials');
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
         };
       }
     })
   ],
   pages: {
     signIn: '/login',
+    error: '/login',
   },
   session: {
     strategy: "jwt",
@@ -68,6 +119,7 @@ export const authOptions: AuthOptions = {
         return {
           ...token,
           id: user.id,
+          role: user.role,
         };
       }
       return token;
@@ -78,6 +130,7 @@ export const authOptions: AuthOptions = {
         user: {
           ...session.user,
           id: token.id,
+          role: token.role,
         },
       };
     },

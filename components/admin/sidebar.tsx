@@ -55,9 +55,9 @@ export function AdminSidebar() {
         <div className="flex min-h-0 flex-1 flex-col border-r border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black">
           <div className="flex flex-1 flex-col overflow-y-auto pt-5 pb-4">
             <div className="flex flex-shrink-0 items-center px-4">
-              <Link href="/admin" className="flex items-center gap-2">
-                <Logo className="h-8 w-8" />
-                <span className="font-semibold">Admin</span>
+              <Link href="/admin" className="flex items-center gap-4">
+                <Logo className="h-12 w-auto" />
+                <span className="text-lg font-semibold">Admin</span>
               </Link>
             </div>
             <nav className="mt-8 flex-1 space-y-1 px-2">

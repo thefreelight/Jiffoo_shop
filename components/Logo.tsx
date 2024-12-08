@@ -12,8 +12,8 @@ export function Logo({ className }: LogoProps) {
     <Image
       src="/logos/jiffoo-logo.svg"
       alt="Jiffoo Logo"
-      width={120}
-      height={40}
+      width={360}
+      height={120}
       className={className}
     />
   );
