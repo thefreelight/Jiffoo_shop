@@ -1,48 +1,44 @@
 import { NextResponse } from 'next/server';
-import { getServerSession as getServerSessionHelper } from 'next-auth/next';
-import { validateReferralCode, calculateDiscountedPrice } from '@/lib/referral';
-import { authOptions } from '@/auth';
-import type { Session } from 'next-auth';
+import prisma from "@/lib/prisma";
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const session = await getServerSessionHelper(authOptions) as Session | null;
-
-    if (!session?.user?.email) {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
-
-    const body = await req.json();
-    const { code } = body;
+    const { code } = await request.json();
 
     if (!code) {
-      return new NextResponse('Referral code is required', { status: 400 });
+      return NextResponse.json(
+        { error: "Referral code is required" },
+        { status: 400 }
+      );
     }
 
-    const validation = await validateReferralCode(code, session.user.id);
+    const referralCode = await prisma.referralCode.findUnique({
+      where: { 
+        code,
+        isActive: true,
+        OR: [
+          { expiresAt: null },
+          { expiresAt: { gt: new Date() } }
+        ]
+      }
+    });
 
-    if (!validation.valid) {
-      return NextResponse.json({
-        valid: false,
-        error: validation.error,
-      });
+    if (!referralCode) {
+      return NextResponse.json(
+        { error: "Invalid or expired referral code" },
+        { status: 404 }
+      );
     }
-
-    const priceData = calculateDiscountedPrice(9900, validation.referralCode.discountPercent);
 
     return NextResponse.json({
-      valid: true,
-      discount: {
-        percent: validation.referralCode.discountPercent,
-        amount: priceData.discount,
-        originalPrice: priceData.originalPrice,
-        basePrice: priceData.basePrice,
-        finalPrice: priceData.finalPrice,
-        savedAmount: priceData.savedAmount,
-      },
+      discountPercent: referralCode.discountPercent,
+      commissionRate: referralCode.commissionRate,
     });
   } catch (error) {
-    console.error('Error validating referral code:', error);
-    return new NextResponse('Internal Error', { status: 500 });
+    console.error("Error validating referral code:", error);
+    return NextResponse.json(
+      { error: "Failed to validate referral code" },
+      { status: 500 }
+    );
   }
 } 

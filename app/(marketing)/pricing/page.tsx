@@ -1,24 +1,40 @@
-import prisma from "@/lib/prisma";
-import type { Feature, PricingConfig } from "@prisma/client";
+'use client';
 
-interface PricingConfigWithFeatures extends PricingConfig {
+import { useState } from 'react';
+import prisma from "@/lib/prisma";
+
+interface Feature {
+  id: string;
+  title: string;
+  description: string;
+  order: number;
+}
+
+interface PricingConfig {
+  id: string;
+  originalPrice: number;
+  currentPrice: number;
   features: Feature[];
 }
 
-async function getActivePricingConfig(): Promise<PricingConfigWithFeatures | null> {
-  return prisma.pricingConfig.findFirst({
-    where: { isActive: true },
-    include: {
-      features: {
-        orderBy: { order: 'asc' }
-      }
-    }
-  });
+async function getActivePricingConfig(): Promise<PricingConfig | null> {
+  const response = await fetch('/api/pricing/active');
+  if (!response.ok) return null;
+  return response.json();
 }
 
-export default async function PricingPage() {
-  const config = await getActivePricingConfig();
-  
+export default function PricingPage() {
+  const [config, setConfig] = useState<PricingConfig | null>(null);
+  const [referralCode, setReferralCode] = useState('');
+  const [referralDiscount, setReferralDiscount] = useState<number>(0);
+  const [isValidating, setIsValidating] = useState(false);
+  const [error, setError] = useState('');
+
+  // 加载初始价格配置
+  useState(() => {
+    getActivePricingConfig().then(setConfig);
+  }, []);
+
   if (!config) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-white to-neutral-50 dark:from-black dark:to-neutral-900">
@@ -28,7 +44,7 @@ export default async function PricingPage() {
               Pricing
             </h1>
             <p className="mt-6 text-lg leading-8 text-neutral-600 dark:text-neutral-400">
-              Pricing information is not available at the moment.
+              Loading pricing information...
             </p>
           </div>
         </div>
@@ -37,26 +53,72 @@ export default async function PricingPage() {
   }
 
   const hasDiscount = config.originalPrice > config.currentPrice;
-  const discountPercentage = hasDiscount 
+  const baseDiscountPercentage = hasDiscount 
     ? Math.round((1 - config.currentPrice / config.originalPrice) * 100)
     : 0;
+
+  // 计算最终价格
+  const finalPrice = referralDiscount > 0
+    ? config.currentPrice * (1 - referralDiscount / 100)
+    : config.currentPrice;
+
+  // 计算总折扣
+  const totalDiscountPercentage = referralDiscount > 0
+    ? Math.round((1 - finalPrice / config.originalPrice) * 100)
+    : baseDiscountPercentage;
+
+  // 验证推广码
+  const validateReferralCode = async () => {
+    if (!referralCode.trim()) {
+      setError('Please enter a referral code');
+      return;
+    }
+
+    setIsValidating(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/referral/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code: referralCode }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Invalid referral code');
+        setReferralDiscount(0);
+      } else {
+        setReferralDiscount(data.discountPercent);
+      }
+    } catch (err) {
+      setError('Failed to validate referral code');
+      setReferralDiscount(0);
+    } finally {
+      setIsValidating(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-neutral-50 dark:from-black dark:to-neutral-900">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24">
         <div className="text-center">
-          {hasDiscount && (
+          {(hasDiscount || referralDiscount > 0) && (
             <>
               <div className="inline-flex items-center rounded-full px-4 py-1 text-sm leading-6 text-blue-600 ring-1 ring-blue-600/10 bg-blue-50 dark:bg-blue-900/10">
-                🎉 Limited Time Offer
+                🎉 Special Offer
               </div>
               <h1 className="mt-8 text-4xl font-bold tracking-tight text-black dark:text-white sm:text-6xl bg-clip-text text-transparent bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb]">
-                Special Launch Price: {discountPercentage}% Off
+                Special Price: {totalDiscountPercentage}% Off
               </h1>
             </>
           )}
           <p className="mt-6 text-lg leading-8 text-neutral-600 dark:text-neutral-400">
-            Get instant access to our production-ready AI application source code for just ${(config.currentPrice / 100).toFixed(2)}. {hasDiscount && "Hurry up - this special price won't last long!"}
+            Get instant access to our production-ready AI application source code for just ${(finalPrice / 100).toFixed(2)}. 
+            {(hasDiscount || referralDiscount > 0) && "Hurry up - this special price won't last long!"}
           </p>
         </div>
 
@@ -88,27 +150,41 @@ export default async function PricingPage() {
               <div className="mx-auto max-w-xs px-8">
                 <p className="text-base font-semibold text-neutral-600 dark:text-neutral-400">One-time payment</p>
                 <div className="mt-6 flex items-baseline justify-center gap-x-2">
-                  {hasDiscount && (
+                  {(hasDiscount || referralDiscount > 0) && (
                     <span className="text-sm font-semibold leading-6 tracking-wide text-neutral-600 dark:text-neutral-400 line-through">
                       ${(config.originalPrice / 100).toFixed(2)}
                     </span>
                   )}
                   <span className="text-5xl font-bold tracking-tight text-black dark:text-white">
-                    ${(config.currentPrice / 100).toFixed(2)}
+                    ${(finalPrice / 100).toFixed(2)}
                   </span>
                 </div>
-                {hasDiscount && (
+                {(hasDiscount || referralDiscount > 0) && (
                   <div className="mt-2 text-sm text-blue-600">
-                    Save ${((config.originalPrice - config.currentPrice) / 100).toFixed(2)}
+                    Save ${((config.originalPrice - finalPrice) / 100).toFixed(2)}
                   </div>
                 )}
                 <div className="mt-10">
-                  <div className="rounded-md bg-white dark:bg-black p-2.5">
-                    <input
-                      type="text"
-                      placeholder="Enter referral code"
-                      className="w-full bg-transparent border-0 text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:ring-0 sm:text-sm"
-                    />
+                  <div className="space-y-2">
+                    <div className="relative rounded-md">
+                      <input
+                        type="text"
+                        value={referralCode}
+                        onChange={(e) => setReferralCode(e.target.value)}
+                        placeholder="Enter referral code"
+                        className="w-full rounded-md bg-white dark:bg-black p-2.5 text-neutral-900 dark:text-white placeholder:text-neutral-400 focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
+                    {error && (
+                      <p className="text-sm text-red-600">{error}</p>
+                    )}
+                    <button
+                      onClick={validateReferralCode}
+                      disabled={isValidating || !referralCode.trim()}
+                      className="w-full rounded-md bg-blue-50 dark:bg-blue-900/10 px-3 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/20 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                    >
+                      {isValidating ? 'Validating...' : 'Apply Code'}
+                    </button>
                   </div>
                 </div>
                 <a
