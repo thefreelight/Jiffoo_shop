@@ -1,20 +1,13 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { Button } from "../button";
 import { Logo } from "../Logo";
 import Link from "next/link";
 import { ModeToggle } from "../mode-toggle";
-import { useRouter } from "next/navigation";
 
 export function DashboardHeader() {
   const { data: session } = useSession();
-  const router = useRouter();
-
-  const handleSignOut = async () => {
-    await signOut({ redirect: false });
-    router.push("/login");
-  };
 
   return (
     <header className="border-b border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black">
@@ -47,17 +40,10 @@ export function DashboardHeader() {
           </div>
           <div className="flex items-center gap-4">
             <ModeToggle />
-            <div className="hidden md:flex items-center gap-3">
+            <div className="hidden md:flex md:items-center md:gap-2">
               <span className="text-base text-neutral-700 dark:text-neutral-300">
                 {session?.user?.email}
               </span>
-              <Button 
-                variant="simple" 
-                onClick={handleSignOut}
-                className="text-base"
-              >
-                Sign Out
-              </Button>
             </div>
           </div>
         </div>

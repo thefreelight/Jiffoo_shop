@@ -20,76 +20,70 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
-        try {
-          if (!credentials?.email || !credentials?.password) {
-            throw new Error('Please enter both email and password');
-          }
-
-          const user = await prisma.user.findUnique({
-            where: {
-              email: credentials.email
-            }
-          });
-
-          if (!user) {
-            throw new Error('No user found with this email');
-          }
-
-          if (!user.hashedPassword) {
-            throw new Error('Please login with OAuth provider');
-          }
-
-          const isCorrectPassword = await bcrypt.compare(
-            credentials.password,
-            user.hashedPassword
-          );
-
-          if (!isCorrectPassword) {
-            throw new Error('Invalid password');
-          }
-
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name,
-          };
-        } catch (error) {
-          console.error('Auth error:', error);
-          throw error;
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error('Please enter both email and password');
         }
+
+        const user = await prisma.user.findUnique({
+          where: {
+            email: credentials.email
+          }
+        });
+
+        if (!user) {
+          throw new Error('No user found with this email');
+        }
+
+        if (!user.hashedPassword) {
+          throw new Error('Please login with OAuth provider');
+        }
+
+        const isCorrectPassword = await bcrypt.compare(
+          credentials.password,
+          user.hashedPassword
+        );
+
+        if (!isCorrectPassword) {
+          throw new Error('Invalid password');
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+        };
       }
     })
   ],
   pages: {
     signIn: '/login',
-    error: '/auth/error',
   },
-  debug: process.env.NODE_ENV === 'development',
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    async jwt({ token, user }): Promise<ExtendedToken> {
+    async jwt({ token, user }) {
       if (user) {
         return {
           ...token,
           id: user.id,
         };
       }
-      return token as ExtendedToken;
+      return token;
     },
     async session({ session, token }) {
       return {
         ...session,
         user: {
           ...session.user,
-          id: (token as ExtendedToken).id,
+          id: token.id,
         },
       };
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
 }
 
 const handler = NextAuth(authOptions)

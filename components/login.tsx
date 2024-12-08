@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 import {
   Form,
@@ -40,6 +41,7 @@ export type LoginUser = z.infer<typeof formSchema>;
 export function LoginForm() {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const form = useForm<LoginUser>({
     resolver: zodResolver(formSchema),
@@ -49,36 +51,28 @@ export function LoginForm() {
     },
   });
 
-  const handleSubmit = (values: LoginUser) => {
+  const handleSubmit = async (values: LoginUser) => {
     setIsLoading(true);
     setError("");
 
-    fetch("/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success) {
-          signIn("credentials", {
-            email: values.email,
-            password: values.password,
-            callbackUrl: "/dashboard",
-          });
-        } else {
-          setError(data.error || "Login failed");
-        }
-      })
-      .catch((err) => {
-        console.error("Login error:", err);
-        setError("An unexpected error occurred");
-      })
-      .finally(() => {
-        setIsLoading(false);
+    try {
+      const result = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false,
       });
+
+      if (result?.error) {
+        setError(result.error);
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      setError("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
