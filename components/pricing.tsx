@@ -165,7 +165,7 @@ export function Pricing() {
                 {isLoading ? 'Processing...' : 'Get Started Now'}
               </Button>
               <p className="mt-4 text-sm text-center text-neutral-500">
-                30-day money-back guarantee • Instant access • Lifetime updates
+                Instant access • Lifetime updates
               </p>
             </div>
           </div>
