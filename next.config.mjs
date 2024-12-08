@@ -4,7 +4,25 @@ import remarkGfm from "remark-gfm";
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  images: { domains: ["i.pravatar.cc", "images.unsplash.com"] },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'i.pravatar.cc'
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.simpleicons.org'
+      }
+    ],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+  },
   pageExtensions: ["ts", "tsx", "mdx"],
 };
 
