@@ -9,12 +9,14 @@ interface LogoProps {
 
 export function Logo({ className }: LogoProps) {
   return (
-    <Image
-      src="/logos/jiffoo-logo.svg"
-      alt="Jiffoo Logo"
-      width={120}
-      height={40}
-      className={className}
-    />
+    <Link href="/" className="cursor-pointer">
+      <Image
+        src="/logos/jiffoo-logo.svg"
+        alt="Jiffoo Logo"
+        width={120}
+        height={40}
+        className={className}
+      />
+    </Link>
   );
 }

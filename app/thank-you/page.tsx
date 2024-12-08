@@ -9,6 +9,8 @@ import { getRepoUrl } from "@/lib/github";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
+import { NavBar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
 
 async function checkUserAccess(userId: string, maxRetries = 10): Promise<boolean> {
   console.log(`Starting access check for user ${userId}`);
@@ -83,49 +85,53 @@ export default async function ThankYouPage({
     const repoUrl = getRepoUrl();
 
     return (
-      <div className="relative overflow-hidden py-20 md:py-40">
-        <Background />
-        <Container className="flex flex-col items-center justify-between pb-20">
-          <div className="relative z-20">
-            <div className="flex flex-col items-center gap-4">
-              <span className="px-4 py-1 bg-gradient-to-r from-[#0aa6fd]/10 to-[#2a2bdb]/10 rounded-full text-sm font-medium text-[#0aa6fd]">
-                🎉 Thank You for Your Purchase!
-              </span>
-              <Heading as="h1" className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-transparent bg-clip-text text-center">
-                Welcome to the Jiffoo Family
-              </Heading>
+      <>
+        <NavBar />
+        <div className="relative overflow-hidden py-20 md:py-40">
+          <Background />
+          <Container className="flex flex-col items-center justify-between pb-20">
+            <div className="relative z-20">
+              <div className="flex flex-col items-center gap-4">
+                <span className="px-4 py-1 bg-gradient-to-r from-[#0aa6fd]/10 to-[#2a2bdb]/10 rounded-full text-sm font-medium text-[#0aa6fd]">
+                  🎉 Thank You for Your Purchase!
+                </span>
+                <Heading as="h1" className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-transparent bg-clip-text text-center">
+                  Welcome to the Jiffoo Family
+                </Heading>
+              </div>
+              <Subheading className="text-center max-w-2xl mx-auto">
+                Your purchase was successful! You now have lifetime access to the NavToAI source code.
+                Check your email for further instructions on accessing the code repository.
+              </Subheading>
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                <Button
+                  as="a"
+                  href={repoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500"
+                >
+                  Access Source Code
+                </Button>
+                <Button
+                  variant="simple"
+                  as={Link}
+                  href="/docs"
+                  className="flex space-x-2 items-center group text-[#0aa6fd] hover:text-[#2a2bdb] transition-colors duration-200"
+                >
+                  <span>View Documentation</span>
+                  <HiArrowRight className="text-current group-hover:translate-x-1 stroke-[1px] h-3 w-3 transition-all duration-200" />
+                </Button>
+              </div>
+              <p className="mt-6 text-sm text-center text-neutral-500">
+                Note: You should receive a GitHub invitation email shortly. Please accept it to access the repository.
+                If you don't receive the invitation within 5 minutes, please contact support.
+              </p>
             </div>
-            <Subheading className="text-center max-w-2xl mx-auto">
-              Your purchase was successful! You now have lifetime access to the NavToAI source code.
-              Check your email for further instructions on accessing the code repository.
-            </Subheading>
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                as="a"
-                href={repoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500"
-              >
-                Access Source Code
-              </Button>
-              <Button
-                variant="simple"
-                as={Link}
-                href="/docs"
-                className="flex space-x-2 items-center group text-[#0aa6fd] hover:text-[#2a2bdb] transition-colors duration-200"
-              >
-                <span>View Documentation</span>
-                <HiArrowRight className="text-current group-hover:translate-x-1 stroke-[1px] h-3 w-3 transition-all duration-200" />
-              </Button>
-            </div>
-            <p className="mt-6 text-sm text-center text-neutral-500">
-              Note: You should receive a GitHub invitation email shortly. Please accept it to access the repository.
-              If you don't receive the invitation within 5 minutes, please contact support.
-            </p>
-          </div>
-        </Container>
-      </div>
+          </Container>
+        </div>
+        <Footer />
+      </>
     );
   } catch (error) {
     console.error('Error in thank-you page:', error);
