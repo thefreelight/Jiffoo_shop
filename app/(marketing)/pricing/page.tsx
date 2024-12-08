@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import prisma from "@/lib/prisma";
 
 interface Feature {
@@ -24,14 +26,17 @@ async function getActivePricingConfig(): Promise<PricingConfig | null> {
 }
 
 export default function PricingPage() {
+  const router = useRouter();
+  const { data: session } = useSession();
   const [config, setConfig] = useState<PricingConfig | null>(null);
   const [referralCode, setReferralCode] = useState('');
   const [referralDiscount, setReferralDiscount] = useState<number>(0);
   const [isValidating, setIsValidating] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   // 加载初始价格配置
-  useState(() => {
+  useEffect(() => {
     getActivePricingConfig().then(setConfig);
   }, []);
 
@@ -99,6 +104,42 @@ export default function PricingPage() {
       setReferralDiscount(0);
     } finally {
       setIsValidating(false);
+    }
+  };
+
+  // 处理结算
+  const handleCheckout = async () => {
+    setIsLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          referralCode: referralDiscount > 0 ? referralCode : undefined,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          // 未登录，重定向到登录页面
+          router.push(`/login?redirect=${encodeURIComponent('/pricing')}`);
+          return;
+        }
+        throw new Error(data.error || 'Failed to create checkout session');
+      }
+
+      // 重定向到 Stripe 结算页面
+      window.location.href = data.url;
+    } catch (err) {
+      setError('Failed to initiate checkout. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -187,12 +228,13 @@ export default function PricingPage() {
                     </button>
                   </div>
                 </div>
-                <a
-                  href="#"
-                  className="mt-10 block w-full rounded-md bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:from-[#2a2bdb] hover:to-[#0aa6fd] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all duration-500"
+                <button
+                  onClick={handleCheckout}
+                  disabled={isLoading}
+                  className="mt-10 block w-full rounded-md bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:from-[#2a2bdb] hover:to-[#0aa6fd] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all duration-500 disabled:opacity-50"
                 >
-                  Get Access Now
-                </a>
+                  {isLoading ? 'Processing...' : 'Get Access Now'}
+                </button>
                 <p className="mt-6 text-xs leading-5 text-neutral-600 dark:text-neutral-400">
                   Invoices and receipts available for easy company reimbursement
                 </p>
