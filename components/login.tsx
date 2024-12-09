@@ -16,7 +16,7 @@ import {
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { IconBrandGithub } from "@tabler/icons-react";
+import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
 import Password from "./password";
 import { Button } from "./button";
 import { Logo } from "./Logo";
@@ -207,7 +207,16 @@ export function LoginForm() {
                 </div>
               </div>
 
-              <div className="mt-6 w-full flex items-center justify-center">
+              <div className="mt-6 grid grid-cols-1 gap-3">
+                <Button
+                  type="button"
+                  onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
+                  className="w-full py-1.5 bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500"
+                >
+                  <IconBrandGoogle className="h-5 w-5" />
+                  <span className="text-sm font-semibold leading-6">Google</span>
+                </Button>
+
                 <Button
                   type="button"
                   onClick={() => signIn('github', { callbackUrl: '/dashboard' })}
