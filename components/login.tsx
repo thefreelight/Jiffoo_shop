@@ -1,10 +1,17 @@
 "use client";
 
+import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
+import Password from "./password";
+import { Button } from "./button";
+import { Logo } from "./Logo";
+import { useState } from "react";
 
 import {
   Form,
@@ -15,12 +22,6 @@ import {
 } from "@/components/ui/form";
 
 import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { IconBrandGithub, IconBrandGoogle } from "@tabler/icons-react";
-import Password from "./password";
-import { Button } from "./button";
-import { Logo } from "./Logo";
-import { useState } from "react";
 
 const formSchema = z.object({
   email: z
@@ -42,6 +43,8 @@ export function LoginForm() {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
 
   const form = useForm<LoginUser>({
     resolver: zodResolver(formSchema),
@@ -65,7 +68,7 @@ export function LoginForm() {
       if (result?.error) {
         setError(result.error);
       } else {
-        router.push("/dashboard");
+        router.push(callbackUrl);
       }
     } catch (err) {
       console.error("Login error:", err);
@@ -210,7 +213,7 @@ export function LoginForm() {
               <div className="mt-6 grid grid-cols-1 gap-3">
                 <Button
                   type="button"
-                  onClick={() => signIn('google', { callbackUrl: '/dashboard' })}
+                  onClick={() => signIn('google', { callbackUrl })}
                   className="w-full py-1.5 bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500"
                 >
                   <IconBrandGoogle className="h-5 w-5" />
@@ -219,7 +222,7 @@ export function LoginForm() {
 
                 <Button
                   type="button"
-                  onClick={() => signIn('github', { callbackUrl: '/dashboard' })}
+                  onClick={() => signIn('github', { callbackUrl })}
                   className="w-full py-1.5 bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500"
                 >
                   <IconBrandGithub className="h-5 w-5" />

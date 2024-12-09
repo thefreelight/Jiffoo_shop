@@ -72,7 +72,8 @@ export function Pricing() {
       setIsLoading(true);
 
       if (!session) {
-        router.push('/login');
+        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        router.push(`/login?callbackUrl=${returnUrl}`);
         return;
       }
 

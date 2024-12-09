@@ -113,6 +113,13 @@ export default function PricingPage() {
     setError('');
 
     try {
+      // 如果用户未登录，保存当前URL并重定向到登录页
+      if (!session) {
+        const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+        router.push(`/login?callbackUrl=${returnUrl}`);
+        return;
+      }
+
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
@@ -126,11 +133,6 @@ export default function PricingPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        if (response.status === 401) {
-          // 未登录，重定向到登录页面
-          router.push(`/login?redirect=${encodeURIComponent('/pricing')}`);
-          return;
-        }
         throw new Error(data.error || 'Failed to create checkout session');
       }
 
