@@ -5,6 +5,8 @@ const nextConfig = {
     domains: [
       'avatars.githubusercontent.com',
       'lh3.googleusercontent.com',
+      'cdn.simpleicons.org',
+      'images.unsplash.com'
     ],
   },
   eslint: {
