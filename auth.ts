@@ -86,11 +86,30 @@ export const authOptions: AuthOptions = {
           scope: 'read:user user:email'
         }
       },
-      profile(profile) {
+      profile(profile: any) {
+        console.log('GitHub profile data:', JSON.stringify(profile, null, 2));
+        
+        // Get email from profile data
+        let email = profile.email;
+        
+        // If no email in profile, try to get from verified emails
+        if (!email && profile.emails && Array.isArray(profile.emails)) {
+          const verifiedEmail = profile.emails.find((e: any) => e.verified && e.primary);
+          if (verifiedEmail) {
+            email = verifiedEmail.email;
+          } else {
+            // Fallback to first verified email
+            const firstVerified = profile.emails.find((e: any) => e.verified);
+            if (firstVerified) {
+              email = firstVerified.email;
+            }
+          }
+        }
+
         return {
           id: profile.id.toString(),
           name: profile.name || profile.login,
-          email: profile.email,
+          email: email,
           image: profile.avatar_url,
           role: 'user',
           hasAccess: false,
