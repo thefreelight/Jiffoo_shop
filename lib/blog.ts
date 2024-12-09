@@ -1,4 +1,6 @@
 import glob from "fast-glob";
+import { cache } from "react";
+import path from "path";
 
 interface Blog {
   title: string;
@@ -15,24 +17,28 @@ export interface BlogWithSlug extends Blog {
   slug: string;
 }
 
-async function importBlog(blogFilename: string): Promise<BlogWithSlug> {
-  let { blog } = (await import(`../app/(marketing)/blog/${blogFilename}`)) as {
-    default: React.ComponentType;
-    blog: Blog;
-  };
-
+async function getBlogMetadata(blogPath: string): Promise<BlogWithSlug> {
+  // 从文件名中提取 slug
+  const slug = path.dirname(blogPath).split("/").pop() || "";
+  
+  // 导入元数据文件
+  const { blog } = await import(`../app/(marketing)/blog/${slug}/metadata.ts`);
+  
   return {
-    slug: blogFilename.replace(/(\/page)?\.mdx$/, ""),
     ...blog,
+    slug,
   };
 }
 
-export async function getAllBlogs() {
-  let blogFilenames = await glob("*/page.mdx", {
-    cwd: "./app/(marketing)/blog",
+export const getAllBlogs = cache(async (): Promise<BlogWithSlug[]> => {
+  // 查找所有的 metadata.ts 文件
+  const blogPaths = await glob("**/metadata.ts", {
+    cwd: "app/(marketing)/blog",
   });
 
-  let blogs = await Promise.all(blogFilenames.map(importBlog));
+  const blogs = await Promise.all(
+    blogPaths.map((blogPath) => getBlogMetadata(blogPath))
+  );
 
-  return blogs.sort((a, z) => +new Date(z.date) - +new Date(a.date));
-}
+  return blogs.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+});
