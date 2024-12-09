@@ -3,7 +3,7 @@ import { headers } from 'next/headers';
 import prisma from '@/lib/prisma';
 import Stripe from 'stripe';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/auth';
+import { authOptions } from '@/lib/auth';
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 4. 计算最终价��
+    // 4. 计算最终���格
     let finalPrice = config.currentPrice;
     let referralCodeRecord = null;
 
@@ -206,4 +206,6 @@ export async function POST(request: Request) {
       { status: 500 }
     );
   }
-} 
+}
+
+export const runtime = 'nodejs' 

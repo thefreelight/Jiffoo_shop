@@ -1,31 +1,49 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { updateReferralCode } from '@/lib/referral';
-import { authOptions } from '@/auth';
-import type { Session } from 'next-auth';
+import prisma from '@/lib/prisma';
+import { authOptions } from '@/lib/auth';
 
-export async function POST(req: Request) {
+export const runtime = 'nodejs'
+
+export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions) as Session | null;
-
-    if (!session?.user?.id) {
-      return new NextResponse('Unauthorized', { status: 401 });
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
-    const { code } = body;
-
+    const { code } = await request.json();
     if (!code) {
-      return new NextResponse('Code is required', { status: 400 });
+      return NextResponse.json({ error: "Code is required" }, { status: 400 });
     }
 
-    const updatedCode = await updateReferralCode(session.user.id, code);
+    // Find the user's existing referral code
+    const existingCode = await prisma.referralCode.findFirst({
+      where: {
+        userId: session.user.id,
+      },
+    });
+
+    if (!existingCode) {
+      return NextResponse.json({ error: "No referral code found" }, { status: 404 });
+    }
+
+    // Update the code
+    const updatedCode = await prisma.referralCode.update({
+      where: {
+        id: existingCode.id,
+      },
+      data: {
+        code: code.toUpperCase(),
+      },
+    });
+
     return NextResponse.json(updatedCode);
   } catch (error) {
-    console.error('Error updating referral code:', error);
-    if (error instanceof Error) {
-      return new NextResponse(error.message, { status: 400 });
-    }
-    return new NextResponse('Internal Error', { status: 500 });
+    console.error("Error updating referral code:", error);
+    return NextResponse.json(
+      { error: "Failed to update referral code" },
+      { status: 500 }
+    );
   }
 } 

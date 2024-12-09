@@ -3,7 +3,7 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { ReferralCodesList } from "@/components/dashboard/referral-codes-list";
 import { CommissionStats } from "@/components/dashboard/commission-stats";
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/auth";
+import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { OrdersList } from "@/components/dashboard/orders-list";

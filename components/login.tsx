@@ -1,5 +1,6 @@
 "use client";
 
+import { Suspense } from "react";
 import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -39,7 +40,7 @@ const formSchema = z.object({
 
 export type LoginUser = z.infer<typeof formSchema>;
 
-export function LoginForm() {
+function LoginFormContent() {
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -245,5 +246,13 @@ export function LoginForm() {
         </div>
       </div>
     </Form>
+  );
+}
+
+export function LoginForm() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginFormContent />
+    </Suspense>
   );
 }

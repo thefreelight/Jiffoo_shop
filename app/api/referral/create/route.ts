@@ -1,16 +1,17 @@
 import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { createReferralCode } from '@/lib/referral';
-import { authOptions } from '@/auth';
+import { authOptions } from '@/lib/auth';
 import type { Session } from 'next-auth';
 import prisma from '@/lib/prisma';
 
+export const runtime = "nodejs";
+
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(authOptions) as Session | null;
-
-    if (!session?.user?.id) {
-      return new NextResponse('Unauthorized', { status: 401 });
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     // Check if user already has a referral code
@@ -21,27 +22,29 @@ export async function POST(req: Request) {
     });
 
     if (existingCode) {
-      return new NextResponse('You already have a referral code', { status: 400 });
+      return NextResponse.json(
+        { error: "User already has a referral code" },
+        { status: 400 }
+      );
     }
 
-    const body = await req.json();
-    const { code } = body;
-
-    // Use fixed system values
-    const referralCode = await createReferralCode(session.user.id, {
-      code,
-      discountPercent: 20, // Fixed 20% discount
-      commissionRate: 30,  // Fixed 30% commission
-      maxUses: undefined,  // No limit on uses
-      expiresAt: undefined // No expiration
+    // Create new referral code
+    const referralCode = await prisma.referralCode.create({
+      data: {
+        userId: session.user.id,
+        code: Math.random().toString(36).substring(2, 8).toUpperCase(),
+        discountPercent: 10,
+        commissionRate: 20,
+        isActive: true,
+      },
     });
 
     return NextResponse.json(referralCode);
   } catch (error) {
-    console.error('Error creating referral code:', error);
-    if (error instanceof Error && error.message === 'This referral code already exists') {
-      return new NextResponse('Referral code already exists', { status: 400 });
-    }
-    return new NextResponse('Internal Error', { status: 500 });
+    console.error("Error creating referral code:", error);
+    return NextResponse.json(
+      { error: "Failed to create referral code" },
+      { status: 500 }
+    );
   }
 } 

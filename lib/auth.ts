@@ -249,42 +249,24 @@ export const authOptions: AuthOptions = {
     },
     async jwt({ token, user, account }) {
       if (user) {
-        return {
-          ...token,
-          id: user.id,
-          role: user.role,
-          hasAccess: user.hasAccess || false,
-        };
+        token.id = user.id;
+        token.role = user.role;
+        token.hasAccess = user.hasAccess;
       }
       return token;
     },
     async session({ session, token }) {
+      const extendedToken = token as ExtendedToken;
       return {
         ...session,
         user: {
           ...session.user,
-          id: token.id,
-          role: token.role,
-          hasAccess: token.hasAccess,
-        },
+          id: extendedToken.id,
+          role: extendedToken.role,
+          hasAccess: extendedToken.hasAccess,
+        }
       };
-    },
-    async redirect({ url, baseUrl }) {
-      // If the url is relative, prefix it with the base url
-      if (url.startsWith('/')) {
-        return `${baseUrl}${url}`;
-      }
-      // If the url is already absolute but on the same host, return it
-      else if (new URL(url).origin === baseUrl) {
-        return url;
-      }
-      // Default to the dashboard
-      return `${baseUrl}/dashboard`;
-    },
+    }
   },
-  secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === 'development',
-}
-
-const handler = NextAuth(authOptions)
-export { handler as GET, handler as POST } 
+} 
