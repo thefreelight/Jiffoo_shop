@@ -1,6 +1,36 @@
--- AlterTable
-ALTER TABLE "User" ADD COLUMN     "hasAccess" BOOLEAN NOT NULL DEFAULT false,
-ADD COLUMN     "role" TEXT NOT NULL DEFAULT 'user';
+-- CreateTable
+CREATE TABLE "User" (
+    "id" TEXT NOT NULL,
+    "name" TEXT,
+    "email" TEXT,
+    "emailVerified" TIMESTAMP(3),
+    "image" TEXT,
+    "hashedPassword" TEXT,
+    "role" TEXT NOT NULL DEFAULT 'user',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "hasAccess" BOOLEAN NOT NULL DEFAULT false,
+
+    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Account" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "provider" TEXT NOT NULL,
+    "providerAccountId" TEXT NOT NULL,
+    "refresh_token" TEXT,
+    "access_token" TEXT,
+    "expires_at" INTEGER,
+    "token_type" TEXT,
+    "scope" TEXT,
+    "id_token" TEXT,
+    "session_token" TEXT,
+
+    CONSTRAINT "Account_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Purchase" (
@@ -73,6 +103,37 @@ CREATE TABLE "Settings" (
     CONSTRAINT "Settings_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "PricingConfig" (
+    "id" TEXT NOT NULL,
+    "originalPrice" INTEGER NOT NULL,
+    "currentPrice" INTEGER NOT NULL,
+    "isActive" BOOLEAN NOT NULL DEFAULT true,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "PricingConfig_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Feature" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "order" INTEGER NOT NULL,
+    "pricingConfigId" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Feature_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Account_provider_providerAccountId_key" ON "Account"("provider", "providerAccountId");
+
 -- CreateIndex
 CREATE UNIQUE INDEX "ReferralCode_code_key" ON "ReferralCode"("code");
 
@@ -84,6 +145,9 @@ CREATE UNIQUE INDEX "Commission_purchaseId_key" ON "Commission"("purchaseId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Settings_key_key" ON "Settings"("key");
+
+-- AddForeignKey
+ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Purchase" ADD CONSTRAINT "Purchase_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -105,3 +169,6 @@ ALTER TABLE "Commission" ADD CONSTRAINT "Commission_referralCodeId_fkey" FOREIGN
 
 -- AddForeignKey
 ALTER TABLE "Commission" ADD CONSTRAINT "Commission_purchaseId_fkey" FOREIGN KEY ("purchaseId") REFERENCES "Purchase"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Feature" ADD CONSTRAINT "Feature_pricingConfigId_fkey" FOREIGN KEY ("pricingConfigId") REFERENCES "PricingConfig"("id") ON DELETE CASCADE ON UPDATE CASCADE;
