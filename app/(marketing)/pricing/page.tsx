@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import prisma from "@/lib/prisma";
 
@@ -27,6 +27,7 @@ async function getActivePricingConfig(): Promise<PricingConfig | null> {
 
 export default function PricingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
   const [config, setConfig] = useState<PricingConfig | null>(null);
   const [referralCode, setReferralCode] = useState('');
@@ -35,10 +36,63 @@ export default function PricingPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // 验证推广码 - 使用 useCallback 包装函数
+  const validateReferralCode = useCallback(async (codeToValidate?: string | React.MouseEvent) => {
+    const codeToUse = typeof codeToValidate === 'string' ? codeToValidate : referralCode;
+    
+    if (!codeToUse || typeof codeToUse !== 'string' || !codeToUse.trim()) {
+      setError('Please enter a referral code');
+      return;
+    }
+
+    setIsValidating(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/referral/validate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code: codeToUse.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Invalid referral code');
+        setReferralDiscount(0);
+        localStorage.removeItem('referralCode');
+      } else {
+        setReferralDiscount(data.discountPercent);
+        localStorage.setItem('referralCode', codeToUse.trim());
+      }
+    } catch (err) {
+      setError('Failed to validate referral code');
+      setReferralDiscount(0);
+      localStorage.removeItem('referralCode');
+    } finally {
+      setIsValidating(false);
+    }
+  }, [referralCode]); // 添加依赖项
+
   // 加载初始价格配置
   useEffect(() => {
     getActivePricingConfig().then(setConfig);
   }, []);
+
+  // 处理推广码
+  useEffect(() => {
+    const urlCode = searchParams.get('referralCode');
+    const savedCode = localStorage.getItem('referralCode');
+    
+    // 优先使用 URL 中的推广码，其次使用保存的推广码
+    const code = urlCode || savedCode || '';
+    if (code && code !== referralCode) {
+      setReferralCode(code);
+      validateReferralCode(code);
+    }
+  }, [searchParams, validateReferralCode]); // 添加 validateReferralCode 作为依赖项
 
   if (!config) {
     return (
@@ -71,41 +125,6 @@ export default function PricingPage() {
   const totalDiscountPercentage = referralDiscount > 0
     ? Math.round((1 - finalPrice / config.originalPrice) * 100)
     : baseDiscountPercentage;
-
-  // 验证推广码
-  const validateReferralCode = async () => {
-    if (!referralCode.trim()) {
-      setError('Please enter a referral code');
-      return;
-    }
-
-    setIsValidating(true);
-    setError('');
-
-    try {
-      const response = await fetch('/api/referral/validate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code: referralCode }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || 'Invalid referral code');
-        setReferralDiscount(0);
-      } else {
-        setReferralDiscount(data.discountPercent);
-      }
-    } catch (err) {
-      setError('Failed to validate referral code');
-      setReferralDiscount(0);
-    } finally {
-      setIsValidating(false);
-    }
-  };
 
   // 处理结算
   const handleCheckout = async () => {
@@ -223,7 +242,7 @@ export default function PricingPage() {
                     )}
                     <button
                       onClick={validateReferralCode}
-                      disabled={isValidating || !referralCode.trim()}
+                      disabled={isValidating || !referralCode || !referralCode.trim()}
                       className="w-full rounded-md bg-blue-50 dark:bg-blue-900/10 px-3 py-2 text-sm font-semibold text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900/20 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
                     >
                       {isValidating ? 'Validating...' : 'Apply Code'}

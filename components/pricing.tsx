@@ -2,13 +2,14 @@
 import { IconCircleCheckFilled } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 import { Button } from "./button";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 
 export function Pricing() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
   const [referralCode, setReferralCode] = useState('');
@@ -33,10 +34,12 @@ export function Pricing() {
     "Lifetime updates",
   ];
 
-  const validateReferralCode = async () => {
-    if (!referralCode) return;
-    if (!session) {
-      router.push('/login');
+  // 验证推广码的函数需要支持直接传入代码
+  const validateReferralCode = useCallback(async (codeToValidate?: string | React.MouseEvent) => {
+    const codeToUse = typeof codeToValidate === 'string' ? codeToValidate : referralCode;
+    
+    if (!codeToUse || typeof codeToUse !== 'string' || !codeToUse.trim()) {
+      toast.error('Please enter a referral code');
       return;
     }
 
@@ -47,25 +50,42 @@ export function Pricing() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ code: referralCode }),
+        body: JSON.stringify({ code: codeToUse.trim() }),
       });
 
       const data = await response.json();
 
       if (data.valid) {
         setDiscountInfo(data.discount);
+        // 保存有效的推广码到 localStorage
+        localStorage.setItem('referralCode', codeToUse.trim());
         toast.success('Referral code applied successfully!');
       } else {
         setDiscountInfo(null);
+        localStorage.removeItem('referralCode');
         toast.error(data.error || 'Invalid referral code');
       }
     } catch (error) {
       console.error('Error validating referral code:', error);
       toast.error('Failed to validate referral code');
+      localStorage.removeItem('referralCode');
     } finally {
       setIsValidating(false);
     }
-  };
+  }, [referralCode]);
+
+  // 从 URL 和 localStorage 获取推广码
+  useEffect(() => {
+    const urlCode = searchParams.get('referralCode');
+    const savedCode = localStorage.getItem('referralCode');
+    
+    // 优先使用 URL 中的推广码，其次使用保存的推广码
+    const code = urlCode || savedCode || '';
+    if (code && code !== referralCode) {
+      setReferralCode(code);
+      validateReferralCode(code);
+    }
+  }, [searchParams, validateReferralCode]);
 
   const handleCheckout = async () => {
     try {
@@ -137,12 +157,15 @@ export function Pricing() {
                   type="text"
                   placeholder="Enter referral code"
                   value={referralCode}
-                  onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
+                  onChange={(e) => {
+                    const newCode = e.target.value.toUpperCase();
+                    setReferralCode(newCode);
+                  }}
                   className="flex-1 px-4 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-black focus:outline-none focus:ring-2 focus:ring-[#0aa6fd]"
                 />
                 <Button
                   onClick={validateReferralCode}
-                  disabled={isValidating || !referralCode}
+                  disabled={isValidating || !referralCode || !referralCode.trim()}
                   className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500"
                 >
                   {isValidating ? 'Validating...' : 'Apply'}
