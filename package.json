@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
-    "start": "node init-db.js && next start",
+    "build": "prisma generate && prisma migrate deploy && next build",
+    "start": "node scripts/init-db.js && next start",
     "lint": "next lint",
     "create-admin": "ts-node --compilerOptions='{\"module\":\"commonjs\"}' scripts/create-admin.ts",
     "init-db": "ts-node --compilerOptions='{\"module\":\"commonjs\"}' scripts/init-db.ts",
