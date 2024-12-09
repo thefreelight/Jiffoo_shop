@@ -7,7 +7,6 @@ import { Badge } from "./badge";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Link } from "next-view-transitions";
 
 export const Hero = () => {
   const router = useRouter();
@@ -86,10 +85,9 @@ export const Hero = () => {
         }}
         className="flex items-center gap-4 justify-center mt-6 relative z-10"
       >
-        <Button as={Link} href="/pricing" className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">Get Source Code</Button>
+        <Button href="/pricing" className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">Get Source Code</Button>
         <Button
           variant="simple"
-          as="a"
           href="https://navtoai.com"
           target="_blank"
           rel="noopener noreferrer"

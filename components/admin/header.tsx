@@ -3,7 +3,6 @@
 import { useSession } from "next-auth/react";
 import { ModeToggle } from "../mode-toggle";
 import { Button } from "../button";
-import Link from "next/link";
 import { IconMenu2, IconSearch } from "@tabler/icons-react";
 import { useState } from "react";
 
@@ -45,7 +44,7 @@ export function AdminHeader() {
               <span className="text-sm text-neutral-700 dark:text-neutral-300">
                 {session?.user?.email}
               </span>
-              <Button variant="simple" as={Link} href="/api/auth/signout">
+              <Button variant="simple" href="/api/auth/signout">
                 Sign Out
               </Button>
             </div>
