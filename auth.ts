@@ -1,6 +1,7 @@
 import NextAuth from "next-auth"
 import { AuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
+import GitHubProvider from "next-auth/providers/github"
 import bcrypt from "bcryptjs"
 import prisma from '@/lib/prisma'
 import { PrismaAdapter } from "@auth/prisma-adapter"
@@ -13,8 +14,89 @@ interface ExtendedToken extends JWT {
 }
 
 export const authOptions: AuthOptions = {
-  adapter: PrismaAdapter(prisma) as any,
+  adapter: {
+    ...PrismaAdapter(prisma),
+    createUser: async (data: any) => {
+      // 检查用户是否已存在
+      const existingUser = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { email: data.email },
+            { name: data.name }
+          ]
+        }
+      });
+
+      if (existingUser) {
+        return existingUser;
+      }
+
+      const user = await prisma.user.create({ data });
+      
+      // 检查用户是否已有推广码
+      const existingReferralCode = await prisma.referralCode.findFirst({
+        where: { userId: user.id }
+      });
+
+      if (!existingReferralCode) {
+        // 自动创建推广码
+        await prisma.referralCode.create({
+          data: {
+            userId: user.id,
+            code: Math.random().toString(36).substring(2, 8).toUpperCase(),
+            discountPercent: 10,
+            commissionRate: 20,
+            isActive: true,
+          },
+        });
+      }
+      
+      return user;
+    },
+    linkAccount: async (data: any) => {
+      const { refresh_token_expires_in, ...accountData } = data;
+      
+      // 检查账号是否已存在
+      const existingAccount = await prisma.account.findFirst({
+        where: {
+          provider: accountData.provider,
+          providerAccountId: accountData.providerAccountId,
+        }
+      });
+
+      if (existingAccount) {
+        // 更新现有账号
+        return prisma.account.update({
+          where: { id: existingAccount.id },
+          data: accountData,
+        }) as any;
+      }
+
+      return prisma.account.create({
+        data: accountData,
+      }) as any;
+    }
+  } as any,
   providers: [
+    GitHubProvider({
+      clientId: process.env.GITHUB_ID as string,
+      clientSecret: process.env.GITHUB_SECRET as string,
+      authorization: {
+        params: {
+          scope: 'read:user user:email'
+        }
+      },
+      profile(profile) {
+        return {
+          id: profile.id.toString(),
+          name: profile.name || profile.login,
+          email: profile.email,
+          image: profile.avatar_url,
+          role: 'user',
+          hasAccess: false,
+        }
+      },
+    }),
     CredentialsProvider({
       id: "credentials",
       name: "credentials",
@@ -117,7 +199,14 @@ export const authOptions: AuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account, profile }) {
+      if (account?.provider === "github") {
+        const { refresh_token_expires_in, ...accountData } = account as any;
+        account = accountData;
+      }
+      return true;
+    },
+    async jwt({ token, user, account }) {
       if (user) {
         return {
           ...token,
@@ -138,6 +227,18 @@ export const authOptions: AuthOptions = {
           hasAccess: token.hasAccess,
         },
       };
+    },
+    async redirect({ url, baseUrl }) {
+      // If the url is relative, prefix it with the base url
+      if (url.startsWith('/')) {
+        return `${baseUrl}${url}`;
+      }
+      // If the url is already absolute but on the same host, return it
+      else if (new URL(url).origin === baseUrl) {
+        return url;
+      }
+      // Default to the dashboard
+      return `${baseUrl}/dashboard`;
     },
   },
   secret: process.env.NEXTAUTH_SECRET,

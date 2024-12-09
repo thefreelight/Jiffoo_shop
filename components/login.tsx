@@ -210,7 +210,7 @@ export function LoginForm() {
               <div className="mt-6 w-full flex items-center justify-center">
                 <Button
                   type="button"
-                  onClick={() => {}}
+                  onClick={() => signIn('github', { callbackUrl: '/dashboard' })}
                   className="w-full py-1.5 bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500"
                 >
                   <IconBrandGithub className="h-5 w-5" />

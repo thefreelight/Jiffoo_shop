@@ -22,6 +22,7 @@
     "@mdx-js/react": "^3.0.1",
     "@next/mdx": "^14.2.3",
     "@octokit/rest": "^21.0.2",
+    "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-label": "^2.1.0",
     "@radix-ui/react-slot": "^1.1.0",
     "@stripe/stripe-js": "^5.2.0",

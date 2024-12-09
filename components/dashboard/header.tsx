@@ -14,9 +14,7 @@ export function DashboardHeader() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center">
-              <Logo className="h-12 w-36" />
-            </Link>
+            <Logo className="h-12 w-36" />
             <nav className="hidden md:flex items-center gap-4">
               <Link 
                 href="/dashboard" 
@@ -42,7 +40,7 @@ export function DashboardHeader() {
             <ModeToggle />
             <div className="hidden md:flex md:items-center md:gap-2">
               <span className="text-base text-neutral-700 dark:text-neutral-300">
-                {session?.user?.email}
+                {session?.user?.name || session?.user?.email}
               </span>
             </div>
           </div>

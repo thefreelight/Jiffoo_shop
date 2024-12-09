@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "../button";
 import { IconEdit, IconX, IconCopy, IconCheck } from "@tabler/icons-react";
 import { toast } from "sonner";
@@ -27,6 +27,14 @@ export function ReferralCodesList({ referralCodes, basePrice }: ReferralCodesLis
   const [isEditing, setIsEditing] = useState(false);
   const [newCode, setNewCode] = useState("");
   const [copied, setCopied] = useState(false);
+  const [inviteLink, setInviteLink] = useState("");
+
+  useEffect(() => {
+    // 在客户端设置完整的 URL
+    if (referralCodes[0]) {
+      setInviteLink(`${window.location.origin}/signup?referralCode=${referralCodes[0].code}`);
+    }
+  }, [referralCodes]);
 
   const handleUpdateCode = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -56,7 +64,6 @@ export function ReferralCodesList({ referralCodes, basePrice }: ReferralCodesLis
   };
 
   const copyInviteLink = async (code: string) => {
-    const inviteLink = `${window.location.origin}/signup?referralCode=${code}`;
     try {
       await navigator.clipboard.writeText(inviteLink);
       setCopied(true);
@@ -68,6 +75,8 @@ export function ReferralCodesList({ referralCodes, basePrice }: ReferralCodesLis
   };
 
   const code = referralCodes[0]; // We know there's only one code per user
+
+  if (!code) return null;
 
   return (
     <div>
@@ -120,70 +129,68 @@ export function ReferralCodesList({ referralCodes, basePrice }: ReferralCodesLis
         </div>
       )}
 
-      {code && (
-        <div className="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 rounded-xl p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-4">
-                <h3 className="text-lg font-semibold text-black dark:text-white">
-                  {code.code}
-                </h3>
-                <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
-                  Active
-                </span>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsEditing(true)}
-                  className="p-2"
-                >
-                  <IconEdit className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => copyInviteLink(code.code)}
-                  className="p-2"
-                >
-                  {copied ? (
-                    <IconCheck className="h-4 w-4 text-green-500" />
-                  ) : (
-                    <IconCopy className="h-4 w-4" />
-                  )}
-                </Button>
+      <div className="bg-white dark:bg-black border border-neutral-200 dark:border-neutral-800 rounded-xl p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="flex items-center gap-4">
+              <h3 className="text-lg font-semibold text-black dark:text-white">
+                {code.code}
+              </h3>
+              <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                Active
+              </span>
+              <Button
+                variant="outline"
+                onClick={() => setIsEditing(true)}
+                className="p-2"
+              >
+                <IconEdit className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => copyInviteLink(code.code)}
+                className="p-2"
+              >
+                {copied ? (
+                  <IconCheck className="h-4 w-4 text-green-500" />
+                ) : (
+                  <IconCopy className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+            <div className="mt-4">
+              <p className="text-sm text-neutral-600 dark:text-neutral-400">
+                Share your invite link:
+              </p>
+              <div className="mt-2 flex items-center gap-2">
+                <code className="px-3 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-900 text-sm flex-1 overflow-x-auto">
+                  {inviteLink || `/signup?referralCode=${code.code}`}
+                </code>
               </div>
-              <div className="mt-4">
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">
-                  Share your invite link:
+            </div>
+            <div className="mt-4 grid grid-cols-3 gap-4 text-sm text-neutral-600 dark:text-neutral-400">
+              <div>
+                <p>Discount</p>
+                <p className="font-medium text-black dark:text-white">
+                  {code.discountPercent}%
                 </p>
-                <div className="mt-2 flex items-center gap-2">
-                  <code className="px-3 py-2 rounded-lg bg-neutral-100 dark:bg-neutral-900 text-sm flex-1 overflow-x-auto">
-                    {`${typeof window !== 'undefined' ? window.location.origin : ''}/signup?referralCode=${code.code}`}
-                  </code>
-                </div>
               </div>
-              <div className="mt-4 grid grid-cols-3 gap-4 text-sm text-neutral-600 dark:text-neutral-400">
-                <div>
-                  <p>Discount</p>
-                  <p className="font-medium text-black dark:text-white">
-                    {code.discountPercent}%
-                  </p>
-                </div>
-                <div>
-                  <p>Commission Rate</p>
-                  <p className="font-medium text-black dark:text-white">
-                    {code.commissionRate}%
-                  </p>
-                </div>
-                <div>
-                  <p>Uses</p>
-                  <p className="font-medium text-black dark:text-white">
-                    {code.uses.length}
-                  </p>
-                </div>
+              <div>
+                <p>Commission Rate</p>
+                <p className="font-medium text-black dark:text-white">
+                  {code.commissionRate}%
+                </p>
+              </div>
+              <div>
+                <p>Uses</p>
+                <p className="font-medium text-black dark:text-white">
+                  {code.uses.length}
+                </p>
               </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 } 
