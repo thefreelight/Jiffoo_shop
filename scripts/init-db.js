@@ -7,8 +7,8 @@ const prisma = new PrismaClient()
 async function checkDatabaseStatus() {
   try {
     // 尝试查询用户表，如果成功说明数据库已经初始化
-    await prisma.user.count()
-    return { exists: true, isEmpty: false }
+    const userCount = await prisma.user.count()
+    return { exists: true, isEmpty: userCount === 0 }
   } catch (error) {
     if (error.code === 'P2021') {  // 表不存在的错误码
       return { exists: false, isEmpty: true }
@@ -18,17 +18,36 @@ async function checkDatabaseStatus() {
   }
 }
 
-async function runMigrations() {
+async function checkAdminExists() {
+  try {
+    const admin = await prisma.user.findFirst({
+      where: {
+        email: 'admin@example.com',
+        role: 'admin'
+      }
+    })
+    return !!admin
+  } catch (error) {
+    if (error.code === 'P2021') {  // 表不存在的错误码
+      return false
+    }
+    throw error
+  }
+}
+
+async function runMigrations(reset = false) {
   try {
     console.log('Running database migrations...')
     
-    // 先尝试重置数据库，但不运行 seed
-    console.log('Resetting database...')
-    execSync('npx prisma migrate reset --force --skip-seed', { stdio: 'inherit' })
-    
-    // 然后运行迁移
-    console.log('Applying migrations...')
-    execSync('npx prisma migrate deploy', { stdio: 'inherit' })
+    if (reset) {
+      // 只在需要时重置数据库
+      console.log('Resetting database...')
+      execSync('npx prisma migrate reset --force --skip-seed', { stdio: 'inherit' })
+    } else {
+      // 否则只运行待处理的迁移
+      console.log('Applying pending migrations...')
+      execSync('npx prisma migrate deploy', { stdio: 'inherit' })
+    }
     
     // 生成 Prisma Client
     console.log('Generating Prisma Client...')
@@ -45,23 +64,15 @@ async function runMigrations() {
 
 async function createAdminUser() {
   try {
-    console.log('Creating admin account...')
-    const hashedPassword = await hash('admin123', 10)
-    
-    // 先检查是否已存在管理员账户
-    const existingAdmin = await prisma.user.findUnique({
-      where: { email: 'admin@example.com' }
-    })
-    
-    if (existingAdmin) {
-      console.log('Admin user already exists:', {
-        id: existingAdmin.id,
-        email: existingAdmin.email,
-        name: existingAdmin.name,
-        role: existingAdmin.role,
-      })
+    // 检查管理员是否已存在
+    const adminExists = await checkAdminExists()
+    if (adminExists) {
+      console.log('Admin user already exists, skipping creation')
       return true
     }
+
+    console.log('Creating admin account...')
+    const hashedPassword = await hash('admin123', 10)
     
     // 创建新的管理员账户
     const admin = await prisma.user.create({
@@ -91,15 +102,19 @@ async function main() {
   try {
     console.log('Starting database initialization...')
     
-    // 运行迁移
-    const migrationSuccess = await runMigrations()
+    // 检查数据库状态
+    const { exists, isEmpty } = await checkDatabaseStatus()
+    console.log('Database status:', { exists, isEmpty })
+    
+    // 只在数据库不存在或为空时运行完整迁移
+    const migrationSuccess = await runMigrations(!exists || isEmpty)
     if (!migrationSuccess) {
       console.error('Migration failed. Please check the migration files and database state.')
       process.exit(1)
     }
     
-    // 创建管理员账户
-    console.log('Attempting to create admin user...')
+    // 检查并创建管理员账户（如果需要）
+    console.log('Checking admin user...')
     const adminCreated = await createAdminUser()
     if (!adminCreated) {
       console.error('Failed to create admin user')
