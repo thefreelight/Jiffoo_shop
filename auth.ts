@@ -84,9 +84,9 @@ export const authOptions: AuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
       authorization: {
         params: {
-          prompt: "consent",
           access_type: "offline",
-          response_type: "code"
+          response_type: "code",
+          prompt: "none"
         }
       },
       profile(profile) {

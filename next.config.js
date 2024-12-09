@@ -21,7 +21,9 @@ const nextConfig = {
     domains: [
       'cdn.simpleicons.org',
       'images.unsplash.com',
-      'i.pravatar.cc'
+      'i.pravatar.cc',
+      'lh3.googleusercontent.com',
+      'avatars.githubusercontent.com'
     ],
   },
   // 添加 Cloudflare 相关配置

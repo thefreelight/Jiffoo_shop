@@ -1,7 +1,6 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { Button } from "../button";
 import { Logo } from "../Logo";
 import Link from "next/link";
 import { ModeToggle } from "../mode-toggle";
@@ -53,9 +52,6 @@ export function DashboardHeader() {
               <span className="text-base text-neutral-700 dark:text-neutral-300">
                 {session?.user?.name || session?.user?.email}
               </span>
-              <Button variant="ghost" href="/api/auth/signout">
-                Sign out
-              </Button>
             </div>
           </div>
         </div>
