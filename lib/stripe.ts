@@ -11,7 +11,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2024-11-20.acacia' as any,
   typescript: true,
 });
 
@@ -76,7 +76,7 @@ export async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   try {
     console.log('Starting database transaction for user:', userId);
     // Start a transaction to ensure all database operations succeed or fail together
-    await prisma.$transaction(async (tx: Omit<PrismaClient, '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'>) => {
+    await prisma.$transaction(async (tx) => {
       // Create the purchase record
       console.log('Creating purchase record...');
       const purchase = await tx.purchase.create({

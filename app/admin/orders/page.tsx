@@ -1,47 +1,50 @@
-import prisma from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
+import prisma from "@/lib/prisma";
 import { IconCalendar, IconUser, IconReceipt } from "@tabler/icons-react";
 import { formatDistance } from "date-fns";
+import { Purchase, User, ReferralUse } from "@prisma/client";
+import { Button } from "@/components/button";
 
-interface Order {
+type UserWithNullableFields = {
   id: string;
-  amount: number;
-  status: string;
+  name: string | null;
+  email: string | null;
+  emailVerified: Date | null;
+  image: string | null;
+  hashedPassword: string | null;
+  role: string;
   createdAt: Date;
-  user: {
-    email: string;
-  };
-  referralUse?: {
+  updatedAt: Date;
+  hasAccess: boolean;
+};
+
+interface OrderWithRelations extends Omit<Purchase, 'user'> {
+  user: UserWithNullableFields;
+  referralUse: (ReferralUse & {
     referralCode: {
-      user: {
-        email: string;
-      };
+      user: UserWithNullableFields;
     };
-  };
+  }) | null;
 }
 
-async function getOrders() {
-  return prisma.purchase.findMany({
+export default async function OrdersPage() {
+  const orders = await prisma.purchase.findMany({
     include: {
       user: true,
       referralUse: {
         include: {
           referralCode: {
             include: {
-              user: true,
-            },
-          },
-        },
-      },
+              user: true
+            }
+          }
+        }
+      }
     },
     orderBy: {
-      createdAt: "desc",
-    },
-  });
-}
-
-export default async function OrdersPage() {
-  const orders = await getOrders();
+      createdAt: 'desc'
+    }
+  }) as OrderWithRelations[];
 
   return (
     <div className="space-y-6">
@@ -53,7 +56,7 @@ export default async function OrdersPage() {
       </div>
 
       <div className="grid gap-4">
-        {orders.map((order: Order) => (
+        {orders.map((order) => (
           <Card key={order.id} className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
@@ -88,6 +91,25 @@ export default async function OrdersPage() {
                     </div>
                     <div className="text-neutral-500">Referred By</div>
                   </div>
+                )}
+                {order.status === "pending" && (
+                  <form action={async () => {
+                    "use server";
+                    await prisma.purchase.update({
+                      where: { id: order.id },
+                      data: {
+                        status: "completed",
+                        accessGranted: true
+                      },
+                    });
+                  }}>
+                    <Button
+                      type="submit"
+                      className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500"
+                    >
+                      Grant Access
+                    </Button>
+                  </form>
                 )}
               </div>
             </div>

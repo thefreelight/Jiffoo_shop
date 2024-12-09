@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
+import { hash } from "bcryptjs";
 import prisma from "@/lib/prisma";
-import { generateReferralCode, getReferralRates } from "@/lib/referral";
+import { validateReferralCode, generateReferralCode, getReferralRates } from "@/lib/referral";
 
 export async function POST(req: Request) {
   try {
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
       }
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await hash(password, 12);
 
     // Create user and generate referral code in a transaction
     const result = await prisma.$transaction(async (tx) => {

@@ -8,13 +8,13 @@ import { JWT } from "next-auth/jwt"
 
 interface ExtendedToken extends JWT {
   id: string;
-  role?: string;
+  role: string;
+  hasAccess: boolean;
 }
 
 export const authOptions: AuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma) as any,
   providers: [
-    // Regular user authentication
     CredentialsProvider({
       id: "credentials",
       name: "credentials",
@@ -30,7 +30,7 @@ export const authOptions: AuthOptions = {
         const user = await prisma.user.findUnique({
           where: {
             email: credentials.email,
-            role: 'user', // Only allow regular users
+            role: 'user',
           }
         });
 
@@ -56,10 +56,11 @@ export const authOptions: AuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
-        };
+          hasAccess: user.hasAccess || false,
+          image: user.image,
+        } as any;
       }
     }),
-    // Admin authentication
     CredentialsProvider({
       id: "admin-credentials",
       name: "Admin Login",
@@ -75,7 +76,7 @@ export const authOptions: AuthOptions = {
         const user = await prisma.user.findUnique({
           where: {
             email: credentials.email,
-            role: 'admin', // Only allow admin users
+            role: 'admin',
           }
         });
 
@@ -101,7 +102,9 @@ export const authOptions: AuthOptions = {
           email: user.email,
           name: user.name,
           role: user.role,
-        };
+          hasAccess: true,
+          image: user.image,
+        } as any;
       }
     })
   ],
@@ -120,6 +123,7 @@ export const authOptions: AuthOptions = {
           ...token,
           id: user.id,
           role: user.role,
+          hasAccess: user.hasAccess || false,
         };
       }
       return token;
@@ -131,6 +135,7 @@ export const authOptions: AuthOptions = {
           ...session.user,
           id: token.id,
           role: token.role,
+          hasAccess: token.hasAccess,
         },
       };
     },

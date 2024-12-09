@@ -23,6 +23,20 @@ interface ReferralCode {
   }>;
 }
 
+interface Order {
+  id: string;
+  amount: number;
+  status: string;
+  createdAt: Date;
+  referralUse?: {
+    referralCode: {
+      user: {
+        email: string;
+      };
+    };
+  };
+}
+
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
 
@@ -31,7 +45,7 @@ export default async function DashboardPage() {
   }
 
   // Fetch user's referral codes and commission data
-  const [referralCodes, orders] = await Promise.all([
+  const [referralCodes, purchaseRecords] = await Promise.all([
     prisma.referralCode.findMany({
       where: {
         userId: session.user.id,
@@ -65,6 +79,21 @@ export default async function DashboardPage() {
       },
     }),
   ]);
+
+  // Transform purchase records to match Order interface
+  const orders: Order[] = purchaseRecords.map(record => ({
+    id: record.id,
+    amount: record.amount,
+    status: record.status,
+    createdAt: record.createdAt,
+    referralUse: record.referralUse ? {
+      referralCode: {
+        user: {
+          email: record.referralUse.referralCode.user.email || '',
+        },
+      },
+    } : undefined,
+  }));
 
   // Calculate total stats
   const stats = referralCodes.reduce((acc: {

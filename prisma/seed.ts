@@ -6,11 +6,20 @@ const prisma = new PrismaClient();
 async function main() {
   try {
     // 创建默认设置
-    await prisma.settings.create({
-      data: {
-        stripeEnabled: false,
-        subscriptionEnabled: false
-      }
+    await prisma.settings.createMany({
+      data: [
+        {
+          key: 'stripeEnabled',
+          value: 'false',
+          description: 'Whether Stripe payment is enabled'
+        },
+        {
+          key: 'subscriptionEnabled',
+          value: 'false',
+          description: 'Whether subscription feature is enabled'
+        }
+      ],
+      skipDuplicates: true
     });
 
     // 创建默认管理员

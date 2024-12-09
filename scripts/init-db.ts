@@ -32,13 +32,24 @@ async function main() {
     }
 
     // 检查并创建默认设置
-    const settingsExist = await prisma.settings.findFirst();
-    if (!settingsExist) {
-      await prisma.settings.create({
-        data: {
-          stripeEnabled: false,
-          subscriptionEnabled: false
-        }
+    const stripeEnabledSetting = await prisma.settings.findFirst({
+      where: { key: 'stripeEnabled' }
+    });
+
+    if (!stripeEnabledSetting) {
+      await prisma.settings.createMany({
+        data: [
+          {
+            key: 'stripeEnabled',
+            value: 'false',
+            description: 'Whether Stripe payment is enabled'
+          },
+          {
+            key: 'subscriptionEnabled',
+            value: 'false',
+            description: 'Whether subscription feature is enabled'
+          }
+        ]
       });
       console.log('Default settings created');
     }

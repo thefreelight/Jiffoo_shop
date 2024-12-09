@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import prisma from '@/lib/prisma';
 import Stripe from 'stripe';
-import { getServerSession } from 'next-auth/next';
+import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -10,7 +10,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2023-10-16',
+  apiVersion: '2023-10-16' as any,
   timeout: 10000, // 10 second timeout
   maxNetworkRetries: 3, // Increase retry attempts
 });
@@ -80,7 +80,7 @@ export async function POST(request: Request) {
       );
     }
 
-    // 4. 计算最终价格
+    // 4. 计算最终价��
     let finalPrice = config.currentPrice;
     let referralCodeRecord = null;
 

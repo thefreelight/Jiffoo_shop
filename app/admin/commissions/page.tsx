@@ -1,48 +1,50 @@
-import prisma from "@/lib/prisma";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/button";
+import prisma from "@/lib/prisma";
 import { IconCalendar, IconUser, IconCreditCard } from "@tabler/icons-react";
 import { formatDistance } from "date-fns";
+import { Commission, User } from "@prisma/client";
+import { Button } from "@/components/button";
 
-interface Commission {
+type UserWithNullableFields = {
   id: string;
-  amount: number;
-  status: string;
+  name: string | null;
+  email: string | null;
+  emailVerified: Date | null;
+  image: string | null;
+  hashedPassword: string | null;
+  role: string;
   createdAt: Date;
+  updatedAt: Date;
+  hasAccess: boolean;
+};
+
+interface CommissionWithRelations extends Omit<Commission, 'referralCode' | 'purchase'> {
   referralCode: {
-    user: {
-      email: string;
-    };
+    user: UserWithNullableFields;
   };
   purchase: {
-    user: {
-      email: string;
-    };
+    user: UserWithNullableFields;
   };
-}
-
-async function getCommissions() {
-  return prisma.commission.findMany({
-    include: {
-      referralCode: {
-        include: {
-          user: true,
-        },
-      },
-      purchase: {
-        include: {
-          user: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
 }
 
 export default async function CommissionsPage() {
-  const commissions = await getCommissions();
+  const commissions = await prisma.commission.findMany({
+    include: {
+      referralCode: {
+        include: {
+          user: true
+        }
+      },
+      purchase: {
+        include: {
+          user: true
+        }
+      }
+    },
+    orderBy: {
+      createdAt: 'desc'
+    }
+  }) as CommissionWithRelations[];
 
   return (
     <div className="space-y-6">
@@ -54,7 +56,7 @@ export default async function CommissionsPage() {
       </div>
 
       <div className="grid gap-4">
-        {commissions.map((commission: Commission) => (
+        {commissions.map((commission) => (
           <Card key={commission.id} className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
