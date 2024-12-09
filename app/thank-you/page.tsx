@@ -115,8 +115,10 @@ export default async function ThankYouPage({
                 </Button>
                 <Button
                   variant="simple"
-                  as={Link}
-                  href="/docs"
+                  as="a"
+                  href="https://docs.jiffoo.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex space-x-2 items-center group text-[#0aa6fd] hover:text-[#2a2bdb] transition-colors duration-200"
                 >
                   <span>View Documentation</span>
