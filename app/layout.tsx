@@ -7,11 +7,32 @@ import { ThemeProvider } from "@/context/theme-provider";
 import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
-  title: "Everything AI",
-  description:
-    "Everything AI is a platform that provides a wide range of AI tools and services to help you stay on top of your business. Generate images, text and everything else that you need to get your business off the ground.",
+  title: "Jiffoo",
+  description: "Launch your apps as fast as a bullet. Speed up your success!",
+  metadataBase: new URL('https://jiffoo.com'),
   openGraph: {
-    images: ["https://ai-saas-template-aceternity.vercel.app/banner.png"],
+    title: "Jiffoo",
+    description: "Launch your apps as fast as a bullet. Speed up your success!",
+    url: 'https://jiffoo.com',
+    siteName: 'Jiffoo',
+    images: [
+      {
+        url: '/banner/og-banner.png',
+        width: 1200,
+        height: 630,
+        alt: 'Jiffoo - Launch your apps as fast as a bullet'
+      }
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Jiffoo',
+    description: 'Launch your apps as fast as a bullet. Speed up your success!',
+    images: ['/banner/og-banner.png'],
+    creator: '@jiffoo',
+    site: '@jiffoo'
   },
 };
 
