@@ -45,7 +45,8 @@ function LoginFormContent() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const from = searchParams.get("from");
+  const callbackUrl = from && !from.includes('/login') ? from : "/dashboard";
 
   const form = useForm<LoginUser>({
     resolver: zodResolver(formSchema),
