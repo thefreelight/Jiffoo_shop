@@ -3,60 +3,55 @@ import { getToken } from 'next-auth/jwt';
 import { NextRequest } from 'next/server';
 
 export async function middleware(req: NextRequest) {
-  const token = await getToken({ req });
-  const isAuth = !!token;
-  const isAuthPage = req.nextUrl.pathname.startsWith('/api/auth');
-  const isAdminPage = req.nextUrl.pathname.startsWith('/admin');
-  const isAdminLoginPage = req.nextUrl.pathname === '/admin/login';
-  const isLoginPage = req.nextUrl.pathname === '/login';
-  const isSignupPage = req.nextUrl.pathname === '/signup';
-  const isPublicAuthPage = isLoginPage || isSignupPage;
-
-  // Allow all auth API routes to pass through
-  if (isAuthPage) {
+  // 检查是否是 API 认证路由
+  if (req.nextUrl.pathname.startsWith('/api/auth')) {
     return null;
   }
 
-  // Handle admin pages
-  if (isAdminPage) {
-    if (isAdminLoginPage) {
-      if (isAuth && token?.role === 'admin') {
-        return NextResponse.redirect(new URL('/admin', req.url));
-      }
-      return null;
-    }
+  const token = await getToken({ req });
+  const isAuth = !!token;
 
+  // 获取当前路径和查询参数
+  const { pathname, search } = req.nextUrl;
+  const fullPath = `${pathname}${search}`;
+
+  // 检查是否是认证相关页面
+  const isLoginPage = pathname === '/login';
+  const isSignupPage = pathname === '/signup';
+  const isAuthPage = isLoginPage || isSignupPage;
+  const isAdminPage = pathname.startsWith('/admin');
+  const isAdminLoginPage = pathname === '/admin/login';
+
+  // 如果已登录用户访问登录/注册页面
+  if (isAuthPage && isAuth) {
+    if (token.role === 'admin') {
+      return NextResponse.redirect(new URL('/admin', req.url));
+    }
+    return NextResponse.redirect(new URL('/dashboard', req.url));
+  }
+
+  // 处理管理员页面
+  if (isAdminPage) {
     if (!isAuth) {
       return NextResponse.redirect(new URL('/admin/login', req.url));
     }
-    
-    if (token?.role !== 'admin') {
+    if (token.role !== 'admin' && !isAdminLoginPage) {
       return NextResponse.redirect(new URL('/', req.url));
     }
-    
-    return null;
-  }
-
-  // Handle public auth pages (login/signup)
-  if (isPublicAuthPage) {
-    if (isAuth) {
-      if (token?.role === 'admin') {
-        return NextResponse.redirect(new URL('/admin', req.url));
-      }
-      return NextResponse.redirect(new URL('/dashboard', req.url));
+    if (isAdminLoginPage && token.role === 'admin') {
+      return NextResponse.redirect(new URL('/admin', req.url));
     }
     return null;
   }
 
-  // Handle protected user pages
-  if (req.nextUrl.pathname.startsWith('/dashboard')) {
+  // 处理需要认证的用户页面
+  if (pathname.startsWith('/dashboard')) {
     if (!isAuth) {
-      const from = req.nextUrl.pathname;
-      return NextResponse.redirect(
-        new URL(`/login?from=${encodeURIComponent(from)}`, req.url)
-      );
+      // 使用 from 参数而不是 callbackUrl
+      const from = encodeURIComponent(pathname);
+      return NextResponse.redirect(new URL(`/login?from=${from}`, req.url));
     }
-    if (token?.role === 'admin') {
+    if (token.role === 'admin') {
       return NextResponse.redirect(new URL('/admin', req.url));
     }
   }
