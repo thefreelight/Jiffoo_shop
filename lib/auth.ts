@@ -268,19 +268,22 @@ export const authOptions: AuthOptions = {
       };
     },
     async redirect({ url, baseUrl }) {
-      // 处理管理员登录
-      if (url.includes('/admin/login')) {
+      // 如果URL包含callback，保持原样
+      if (url.includes('/api/auth/callback')) {
         return url;
       }
+      
       // 如果URL是相对路径，添加baseUrl
       if (url.startsWith('/')) {
         return `${baseUrl}${url}`;
       }
+      
       // 如果URL已经是完整的URL，直接返回
       else if (new URL(url).origin === baseUrl) {
         return url;
       }
-      // 默认返回dashboard
+      
+      // ��认返回dashboard
       return `${baseUrl}/dashboard`;
     },
   },

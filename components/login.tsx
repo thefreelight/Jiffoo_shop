@@ -216,7 +216,10 @@ function LoginFormContent() {
               <div className="mt-6 grid grid-cols-1 gap-3">
                 <Button
                   type="button"
-                  onClick={() => signIn('google', { callbackUrl })}
+                  onClick={() => signIn('google', { 
+                    callbackUrl: '/dashboard',
+                    prompt: 'none'
+                  })}
                   className="w-full py-1.5 bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500"
                 >
                   <IconBrandGoogle className="h-5 w-5" />

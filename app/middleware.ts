@@ -9,6 +9,11 @@ export default withAuth(
     const isAuthPage = req.nextUrl.pathname.startsWith('/login') || 
                       req.nextUrl.pathname.startsWith('/signup');
     const isAdminPage = req.nextUrl.pathname.startsWith('/admin');
+    const isPublicPage = req.nextUrl.pathname === '/';
+
+    if (isPublicPage) {
+      return null;
+    }
 
     if (isAuthPage) {
       if (isAuth) {
@@ -17,7 +22,7 @@ export default withAuth(
       return null;
     }
 
-    if (!isAuth) {
+    if (!isAuth && !isAuthPage) {
       let from = req.nextUrl.pathname;
       if (req.nextUrl.search) {
         from += req.nextUrl.search;
@@ -42,5 +47,11 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/admin/:path*', '/login', '/signup'],
+  matcher: [
+    '/dashboard/:path*', 
+    '/admin/:path*', 
+    '/login', 
+    '/signup',
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
 }; 
