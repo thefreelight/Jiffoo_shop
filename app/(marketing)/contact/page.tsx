@@ -6,43 +6,43 @@ import { HorizontalGradient } from "@/components/horizontal-gradient";
 import { ContactForm } from "@/components/contact";
 
 export const metadata: Metadata = {
-  title: "Contact Us - Everything AI",
-  description:
-    "Everything AI is a platform that provides a wide range of AI tools and services to help you stay on top of your business. Generate images, text and everything else that you need to get your business off the ground.",
+  title: "Contact Us - Jiffoo",
+  description: "Get in touch with the Jiffoo team",
   openGraph: {
-    images: ["https://ai-saas-template-aceternity.vercel.app/banner.png"],
+    title: "Contact Us - Jiffoo",
+    description: "Get in touch with the Jiffoo team",
+    images: [
+      {
+        url: '/banner/og-banner.png',
+        width: 1200,
+        height: 630,
+        alt: 'Contact Jiffoo'
+      }
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Contact Us - Jiffoo',
+    description: 'Get in touch with the Jiffoo team',
+    images: ['/banner/og-banner.png'],
   },
 };
 
-export default function PricingPage() {
+export default function ContactPage() {
   return (
-    <div className="relative overflow-hidden py-20 md:py-0 px-4 md:px-20 bg-gray-50 dark:bg-black">
-      <div className="w-full min-h-screen grid grid-cols-1 md:grid-cols-2 relative overflow-hidden">
-        <Background />
-        <ContactForm />
-        <div className="relative w-full z-20 hidden md:flex border-l border-neutral-100 dark:border-neutral-900 overflow-hidden bg-gray-50 dark:bg-black items-center justify-center">
-          <div className="max-w-sm mx-auto">
-            <FeaturedTestimonials />
-            <p
-              className={cn(
-                "font-semibold text-xl text-center dark:text-muted-dark text-muted"
-              )}
-            >
-              Every AI is used by thousands of users
-            </p>
-            <p
-              className={cn(
-                "font-normal text-base text-center text-neutral-500 dark:text-neutral-200 mt-8"
-              )}
-            >
-              With lots of AI applications around, Everything AI stands out with
-              its state of the art Shitposting capabilities.
-            </p>
-          </div>
-          <HorizontalGradient className="top-20" />
-          <HorizontalGradient className="bottom-20" />
-          <HorizontalGradient className="-right-80 transform rotate-90 inset-y-0 h-full scale-x-150" />
-          <HorizontalGradient className="-left-80 transform rotate-90 inset-y-0 h-full scale-x-150" />
+    <div className="min-h-screen bg-gradient-to-b from-white to-neutral-50 dark:from-black dark:to-neutral-900">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-24">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold tracking-tight text-black dark:text-white sm:text-6xl">
+            Contact Us
+          </h1>
+          <p className="mt-6 text-lg leading-8 text-neutral-600 dark:text-neutral-400">
+            With lots of SaaS applications around, Jiffoo stands out with its unique features and capabilities. 
+            Get in touch with us to learn more about how we can help you build your next project faster.
+          </p>
+        </div>
+        <div className="mt-16">
+          <ContactForm />
         </div>
       </div>
     </div>

@@ -7,11 +7,25 @@ import { Subheading } from "@/components/subheading";
 import { BlogCard } from "@/components/blog-card";
 
 export const metadata: Metadata = {
-  title: "Blogs - Every AI",
-  description:
-    "Everything AI is a platform that provides a wide range of AI tools and services to help you stay on top of your business. Generate images, text and everything else that you need to get your business off the ground.",
+  title: "Blog - Jiffoo",
+  description: "Latest updates and insights from the Jiffoo team",
   openGraph: {
-    images: ["https://ai-saas-template-aceternity.vercel.app/banner.png"],
+    title: "Blog - Jiffoo",
+    description: "Latest updates and insights from the Jiffoo team",
+    images: [
+      {
+        url: '/banner/og-banner.png',
+        width: 1200,
+        height: 630,
+        alt: 'Jiffoo Blog'
+      }
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Blog - Jiffoo',
+    description: 'Latest updates and insights from the Jiffoo team',
+    images: ['/banner/og-banner.png'],
   },
 };
 
