@@ -102,15 +102,17 @@ export async function getReferralRates(userRole: string = 'user'): Promise<{
 }
 
 export function calculateDiscountedPrice(basePrice: number, discountPercent: number) {
+  // Round the discount amount to the nearest cent
   const discount = Math.round((basePrice * discountPercent) / 100);
-  const finalPrice = basePrice - discount;
+  // Round the final price to the nearest cent
+  const finalPrice = Math.round(basePrice - discount);
   
   return {
     originalPrice: 29900, // $299.00 in cents
     basePrice: 9900,      // $99.00 in cents
     discount,
     finalPrice,
-    savedAmount: 29900 - finalPrice,
+    savedAmount: Math.round(29900 - finalPrice), // Round the saved amount as well
   };
 }
 

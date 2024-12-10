@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Link } from "next-view-transitions";
 import { ModeToggle } from "../mode-toggle";
+import { useSession } from "next-auth/react";
 
 type Props = {
   navItems: {
@@ -24,6 +25,7 @@ type Props = {
 export const DesktopNavbar = ({ navItems }: Props) => {
   const { scrollY } = useScroll();
   const [showBackground, setShowBackground] = useState(false);
+  const { data: session } = useSession();
 
   useMotionValueEvent(scrollY, "change", (value) => {
     if (value > 100) {
@@ -53,12 +55,25 @@ export const DesktopNavbar = ({ navItems }: Props) => {
       </div>
       <div className="flex space-x-2 items-center">
         <ModeToggle />
-        <Button variant="simple" href="/login">
-          Login
-        </Button>
-        <Button href="/signup" className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">
-          Sign Up
-        </Button>
+        {session?.user ? (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-neutral-700 dark:text-neutral-300">
+              {session.user.name || session.user.email}
+            </span>
+            <Button variant="simple" href="/dashboard">
+              Dashboard
+            </Button>
+          </div>
+        ) : (
+          <>
+            <Button variant="simple" href="/login">
+              Login
+            </Button>
+            <Button href="/signup" className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">
+              Sign Up
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );

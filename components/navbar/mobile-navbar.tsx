@@ -8,13 +8,13 @@ import { Button } from "../button";
 import { Logo } from "../Logo";
 import { useMotionValueEvent, useScroll } from "framer-motion";
 import { ModeToggle } from "../mode-toggle";
+import { useSession } from "next-auth/react";
 
 export const MobileNavbar = ({ navItems }: any) => {
   const [open, setOpen] = useState(false);
-
   const { scrollY } = useScroll();
-
   const [showBackground, setShowBackground] = useState(false);
+  const { data: session } = useSession();
 
   useMotionValueEvent(scrollY, "change", (value) => {
     if (value > 100) {
@@ -82,13 +82,26 @@ export const MobileNavbar = ({ navItems }: any) => {
               </>
             ))}
           </div>
-          <div className="flex flex-row w-full items-start gap-2.5  px-8 py-4 ">
-            <Button href="/signup" className="bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">
-              Sign Up
-            </Button>
-            <Button variant="simple" href="/login">
-              Login
-            </Button>
+          <div className="flex flex-col w-full items-start gap-2.5 px-8 py-4">
+            {session?.user ? (
+              <>
+                <span className="text-base text-neutral-700 dark:text-neutral-300">
+                  {session.user.name || session.user.email}
+                </span>
+                <Button href="/dashboard" className="w-full bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">
+                  Dashboard
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button href="/signup" className="w-full bg-gradient-to-r from-[#0aa6fd] to-[#2a2bdb] text-white border-none hover:from-[#2a2bdb] hover:to-[#0aa6fd] transition-all duration-500">
+                  Sign Up
+                </Button>
+                <Button variant="simple" href="/login" className="w-full">
+                  Login
+                </Button>
+              </>
+            )}
           </div>
         </div>
       )}
