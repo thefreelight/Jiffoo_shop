@@ -7,6 +7,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import { OrdersList } from "@/components/dashboard/orders-list";
+import { revalidatePath } from "next/cache";
 
 interface ReferralCode {
   id: string;
@@ -36,6 +37,9 @@ interface Order {
     };
   };
 }
+
+// Add revalidation interval
+export const revalidate = 0; // revalidate at every request
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import prisma from '@/lib/prisma';
 import { authOptions } from '@/lib/auth';
+import { getSystemSettings } from '@/lib/settings';
 
 export const runtime = 'nodejs'
 
@@ -28,13 +29,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "No referral code found" }, { status: 404 });
     }
 
-    // Update the code
+    // Get system settings for default values
+    const settings = await getSystemSettings();
+
+    // Update the code with new settings
     const updatedCode = await prisma.referralCode.update({
       where: {
         id: existingCode.id,
       },
       data: {
         code: code.toUpperCase(),
+        discountPercent: settings.defaultDiscountPercent,
+        commissionRate: settings.defaultCommissionRate,
       },
     });
 

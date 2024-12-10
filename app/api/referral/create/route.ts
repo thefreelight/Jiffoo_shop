@@ -4,6 +4,7 @@ import { createReferralCode } from '@/lib/referral';
 import { authOptions } from '@/lib/auth';
 import type { Session } from 'next-auth';
 import prisma from '@/lib/prisma';
+import { getSystemSettings } from '@/lib/settings';
 
 export const runtime = "nodejs";
 
@@ -28,13 +29,16 @@ export async function POST(req: Request) {
       );
     }
 
+    // Get system settings for default values
+    const settings = await getSystemSettings();
+
     // Create new referral code
     const referralCode = await prisma.referralCode.create({
       data: {
         userId: session.user.id,
         code: Math.random().toString(36).substring(2, 8).toUpperCase(),
-        discountPercent: 10,
-        commissionRate: 20,
+        discountPercent: settings.defaultDiscountPercent,
+        commissionRate: settings.defaultCommissionRate,
         isActive: true,
       },
     });

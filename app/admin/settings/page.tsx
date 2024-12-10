@@ -19,7 +19,10 @@ export default async function SettingsPage() {
     ];
 
     await Promise.all(updates);
+    
+    // Revalidate both settings and dashboard pages
     revalidatePath("/admin/settings");
+    revalidatePath("/dashboard");
   }
 
   return (
