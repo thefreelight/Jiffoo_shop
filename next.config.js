@@ -8,6 +8,9 @@ const nextConfig = {
       'cdn.simpleicons.org',
       'images.unsplash.com'
     ],
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   eslint: {
     ignoreDuringBuilds: true,
