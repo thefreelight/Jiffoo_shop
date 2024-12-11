@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     description: "Latest updates and insights from the Jiffoo team",
     images: [
       {
-        url: '/banner/og-banner.png',
+        url: 'https://jiffoo.com/banner/og-banner.png',
         width: 1200,
         height: 630,
         alt: 'Jiffoo Blog'
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Blog - Jiffoo',
     description: 'Latest updates and insights from the Jiffoo team',
-    images: ['/banner/og-banner.png'],
+    images: ['https://jiffoo.com/banner/og-banner.png'],
   },
 };
 

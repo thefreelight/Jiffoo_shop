@@ -7,9 +7,9 @@ import { ThemeProvider } from "@/context/theme-provider";
 import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://jiffoo.com'),
   title: "Jiffoo",
   description: "Launch your apps as fast as a bullet. Speed up your success!",
-  metadataBase: new URL('https://jiffoo.com'),
   openGraph: {
     title: "Jiffoo",
     description: "Launch your apps as fast as a bullet. Speed up your success!",
