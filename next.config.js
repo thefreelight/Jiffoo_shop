@@ -6,7 +6,8 @@ const nextConfig = {
       'avatars.githubusercontent.com',
       'lh3.googleusercontent.com',
       'cdn.simpleicons.org',
-      'images.unsplash.com'
+      'images.unsplash.com',
+      'i.pravatar.cc'
     ],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
