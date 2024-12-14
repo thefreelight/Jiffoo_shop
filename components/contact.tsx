@@ -29,7 +29,7 @@ const formSchema = z.object({
     .string({
       required_error: "Please enter your name",
     })
-    .min(1, "Please enter email"),
+    .min(1, "Please enter your name"),
   email: z
     .string({
       required_error: "Please enter email",
@@ -70,47 +70,29 @@ export function ContactForm() {
   const socials = [
     {
       title: "twitter",
-      href: "https://twitter.com/mannupaaji",
+      href: "https://x.com/jiffoocom",
       icon: (
-        <IconBrandX className="h-5 w-5 text-muted dark:text-muted-dark hover:text-black" />
+        <IconBrandX className="h-5 w-5 text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-white transition-colors" />
       ),
-    },
-    {
-      title: "github",
-      href: "https://github.com/manuarora700",
-      icon: (
-        <IconBrandGithub className="h-5 w-5 text-muted dark:text-muted-dark hover:text-black" />
-      ),
-    },
-    {
-      title: "linkedin",
-      href: "https://linkedin.com/manuarora28",
-      icon: (
-        <IconBrandLinkedin className="h-5 w-5 text-muted dark:text-muted-dark hover:text-black" />
-      ),
-    },
+    }
   ];
 
   return (
     <Form {...form}>
-      <div className="flex relative z-20 items-center w-full justify-center px-4 py-4 lg:py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
-        <div className="mx-auto w-full max-w-md">
-          <div>
-            <h1 className="mt-8 text-2xl font-bold leading-9 tracking-tight text-black dark:text-white">
-              Contact Us
-            </h1>
-            <p className="mt-4 text-muted dark:text-muted-dark  text-sm max-w-sm">
-              Please reach out to us and we will get back to you at the speed of
-              light.
-            </p>
-          </div>
+      <div className="flex relative z-20 items-center w-full justify-center px-4 py-8 sm:px-6 lg:px-8">
+        <div className="w-full max-w-xl bg-white dark:bg-neutral-900/50 rounded-2xl shadow-lg backdrop-blur-sm">
+          <div className="px-8 py-12">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+                Contact Us
+              </h2>
+              <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
+                Please reach out to us and we will get back to you at the speed of light.
+              </p>
+            </div>
 
-          <div className="py-10">
-            <div>
-              <form
-                onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
-              >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-6">
+              <div className="space-y-6">
                 <FormField
                   control={form.control}
                   name="name"
@@ -118,25 +100,24 @@ export function ContactForm() {
                     <FormItem>
                       <label
                         htmlFor="name"
-                        className="block text-sm font-medium leading-6 text-neutral-700 dark:text-muted-dark"
+                        className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
                       >
                         Full Name
                       </label>
                       <FormControl>
-                        <div className="mt-2">
-                          <input
-                            id="name"
-                            type="name"
-                            placeholder="Manu Arora"
-                            className="block w-full bg-white dark:bg-neutral-900 px-4 rounded-md border-0 py-1.5  shadow-aceternity text-black placeholder:text-gray-400 focus:ring-2 focus:ring-neutral-400 focus:outline-none sm:text-sm sm:leading-6 dark:text-white"
-                            {...field}
-                          />
-                        </div>
+                        <input
+                          id="name"
+                          type="text"
+                          placeholder="John Doe"
+                          className="mt-2 block w-full rounded-lg border border-neutral-200 bg-white/50 px-4 py-2.5 text-neutral-900 placeholder:text-neutral-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-white dark:placeholder:text-neutral-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20 text-sm transition-all"
+                          {...field}
+                        />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-xs mt-2 text-red-500" />
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="email"
@@ -144,25 +125,24 @@ export function ContactForm() {
                     <FormItem>
                       <label
                         htmlFor="email"
-                        className="block text-sm font-medium leading-6 text-neutral-700 dark:text-muted-dark"
+                        className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
                       >
-                        Email address
+                        Email Address
                       </label>
                       <FormControl>
-                        <div className="mt-2">
-                          <input
-                            id="email"
-                            type="email"
-                            placeholder="hello@johndoe.com"
-                            className="block w-full bg-white dark:bg-neutral-900 px-4 rounded-md border-0 py-1.5  shadow-aceternity text-black placeholder:text-gray-400 focus:ring-2 focus:ring-neutral-400 focus:outline-none sm:text-sm sm:leading-6 dark:text-white"
-                            {...field}
-                          />
-                        </div>
+                        <input
+                          id="email"
+                          type="email"
+                          placeholder="you@example.com"
+                          className="mt-2 block w-full rounded-lg border border-neutral-200 bg-white/50 px-4 py-2.5 text-neutral-900 placeholder:text-neutral-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-white dark:placeholder:text-neutral-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20 text-sm transition-all"
+                          {...field}
+                        />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-xs mt-2 text-red-500" />
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="company"
@@ -170,25 +150,24 @@ export function ContactForm() {
                     <FormItem>
                       <label
                         htmlFor="company"
-                        className="block text-sm font-medium leading-6 text-neutral-700 dark:text-muted-dark"
+                        className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
                       >
                         Company
                       </label>
                       <FormControl>
-                        <div className="mt-2">
-                          <input
-                            id="company"
-                            type="company"
-                            placeholder="Aceternity Labs, LLC"
-                            className="block w-full bg-white dark:bg-neutral-900 px-4 rounded-md border-0 py-1.5  shadow-aceternity text-black placeholder:text-gray-400 focus:ring-2 focus:ring-neutral-400 focus:outline-none sm:text-sm sm:leading-6 dark:text-white"
-                            {...field}
-                          />
-                        </div>
+                        <input
+                          id="company"
+                          type="text"
+                          placeholder="Your Company"
+                          className="mt-2 block w-full rounded-lg border border-neutral-200 bg-white/50 px-4 py-2.5 text-neutral-900 placeholder:text-neutral-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-white dark:placeholder:text-neutral-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20 text-sm transition-all"
+                          {...field}
+                        />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-xs mt-2 text-red-500" />
                     </FormItem>
                   )}
                 />
+
                 <FormField
                   control={form.control}
                   name="message"
@@ -196,38 +175,47 @@ export function ContactForm() {
                     <FormItem>
                       <label
                         htmlFor="message"
-                        className="block text-sm font-medium leading-6 text-neutral-700 dark:text-muted-dark"
+                        className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
                       >
-                        message
+                        Message
                       </label>
                       <FormControl>
-                        <div className="mt-2">
-                          <textarea
-                            rows={5}
-                            id="message"
-                            placeholder="Enter your message here"
-                            className="block w-full bg-white dark:bg-neutral-900 px-4 rounded-md border-0 py-1.5  shadow-aceternity text-black placeholder:text-gray-400 focus:ring-2 focus:ring-neutral-400 focus:outline-none sm:text-sm sm:leading-6 dark:text-white"
-                            {...field}
-                          />
-                        </div>
+                        <textarea
+                          rows={4}
+                          id="message"
+                          placeholder="How can we help you?"
+                          className="mt-2 block w-full rounded-lg border border-neutral-200 bg-white/50 px-4 py-2.5 text-neutral-900 placeholder:text-neutral-400 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 dark:border-neutral-800 dark:bg-neutral-900/50 dark:text-white dark:placeholder:text-neutral-500 dark:focus:border-blue-500 dark:focus:ring-blue-500/20 text-sm transition-all resize-none"
+                          {...field}
+                        />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className="text-xs mt-2 text-red-500" />
                     </FormItem>
                   )}
                 />
+              </div>
 
-                <div>
-                  <Button className="w-full">Submit</Button>
-                </div>
-              </form>
+              <div>
+                <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg transition-colors">
+                  Send Message
+                </Button>
+              </div>
+            </form>
+
+            <div className="mt-8 pt-8 border-t border-neutral-200 dark:border-neutral-800">
+              <div className="flex items-center justify-center space-x-6">
+                {socials.map((social) => (
+                  <Link
+                    href={social.href}
+                    key={social.title}
+                    className="group"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {social.icon}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className="flex items-center justify-center space-x-4 py-4">
-            {socials.map((social) => (
-              <Link href={social.href} key={social.title}>
-                {social.icon}
-              </Link>
-            ))}
           </div>
         </div>
       </div>
